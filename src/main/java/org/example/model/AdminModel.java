@@ -3,16 +3,16 @@ package org.example.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.Id;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 
 @Entity
-public class Admin {
-    @Id
+public class AdminModel {
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
     private Long id;
     private String username;
     private String password;

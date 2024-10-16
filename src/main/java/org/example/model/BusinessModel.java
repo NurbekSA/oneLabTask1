@@ -4,13 +4,13 @@ package org.example.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import org.springframework.data.annotation.Id;
+import jakarta.persistence.Id;
 
 import java.time.OffsetDateTime;
 
 
 @Entity
-public class Business {
+public class BusinessModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,4 +26,17 @@ public class Business {
     private String directorMail;
     private OffsetDateTime createdAt;
     private OffsetDateTime updatedAt;
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
 }
