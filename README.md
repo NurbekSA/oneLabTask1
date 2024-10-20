@@ -1,45 +1,33 @@
-# Online crowdinvesting and financing search service
+# Investment Management System
 
-## Description of the project
+## Основные возможности
+- CRUD-операции для всех сущностей.
+- Инициализация базы данных тестовыми данными.
+- Встроенная база данных H2 для тестирования и демонстрации.
+- Пример использования Spring AOP
 
-This project is an online service designed for crowdinvesting and helping start-up businesses and startups to attract financing. The platform provides an opportunity for investors with limited funds to invest in projects without high commissions. We also consider the legal and financial aspects related to crowdinvesting.
+## Структура проекта
 
-## Goals and objectives
+### 1. **Модели**
+   - **`AdminModel`**: модель для администраторов системы. Хранит информацию об имени пользователя, пароле, email, роли и статусе активности.
+   - **`BusinessModel`**: модель для бизнесов, содержащая информацию о названии, BIN, адресе, типе платежной системы, отрасли и директоре.
+   - **`CardModel`**: модель для карт, привязанных к инвесторам, включает номер карты, имя держателя и дату истечения срока действия.
+   - **`InvestmentModel`**: модель для инвестиций, связанная с инвестором и заказом. Хранит информацию о сумме, дате и статусе инвестиции.
+   - **`InvestorModel`**: модель для инвесторов, содержащая ИИН, ФИО, номер телефона, email, адрес и тип инвестора (физическое или юридическое лицо).
+   - **`OrderModel`**: модель для заказов, связанных с инвестором, включает информацию о типе инвестиции, целевой и фактической сумме, валюте, сроке погашения, статусе и залоге.
 
-- **Creating a convenient platform** for investors and startups.
-- **Providing information** about available projects for investment.
-- **Ensuring transparency** of crowdinvesting processes.
-- **Assistance to startups** in preparing their projects to raise funds.
-
-## Functionality
-
-- Registration of users (investors and startups).
-- Creation and management of projects for crowdinvesting.
-- View available projects and information about them.
-- The opportunity to invest in projects through the platform.
-- Notification system for the status of investments and projects.
-  
-## Technologies
-
-- **Programming language**: Java
-- **Framework**: Spring Boot
-- **Database**: PostgreSQL
+### 2. **Репозитории**
+   - **`AdminRepo`**, **`BusinessRepo`**, **`CardRepo`**, **`InvestmentRepo`**, **`InvestorRepo`**, **`OrderRepo`**: используются для выполнения CRUD-операций для соответствующих моделей.
+   - Реализованы методы поиска по ключевым полям, такие как `findByUsername`, `findByIin`, `findByInvestor`, и другие.
 
 
+### 4. **Аспекты (AOP)**
+   - **`InvestorAspect`**: реализует обработку событий для поиска инвесторов, включая:
+     - **`@Before`**: выводит сообщение о начале поиска.
+     - **`@AfterReturning`**: выводит информацию об инвестициях, связанных с найденным инвестором.
+     - **`@AfterThrowing`**: обрабатывает исключения, возникшие во время поиска.
+     - **`@Around`**: измеряет время выполнения метода и обрабатывает исключения.
 
-
-### Installation Steps
-
-1. **Clone the repository**:
-``bash
-    git clone <Repository url>
-    ```
-
-2. **Go to the project directory**:
-``bash
-    cd <catalog_name>
-    ```
-
-3. **Configure the database**:
-- Create a new database in PostgreSQL.
-   - Update the `application.properties` file with your database connection data.
+### 5. **Загрузчик данных (`DataLoader`)**
+   - Используется для инициализации базы данных тестовыми данными при запуске приложения.
+   - Создает и сохраняет данные для всех сущностей, включая администраторов, бизнесы, карты, инвесторов, заказы и инвестиции.
