@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class InvestmentService {
-
+    Long now = System.currentTimeMillis();
     private final InvestmentRepo investmentRepo;
 
     @Autowired
@@ -30,7 +30,7 @@ public class InvestmentService {
 
     // Создать новую запись
     public InvestmentModel create(InvestmentModel investmentModel) {
-        investmentModel.setInvestmentDate(OffsetDateTime.now()); // Устанавливаем дату инвестиции
+        investmentModel.setInvestmentDate(now); // Устанавливаем дату инвестиции
         return investmentRepo.save(investmentModel);
     }
 
@@ -48,4 +48,3 @@ public class InvestmentService {
         investmentRepo.deleteById(id);
     }
 }
-

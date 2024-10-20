@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class BusinessService {
-
+    Long now = System.currentTimeMillis();
     private final BusinessRepo businessModelRepository;
 
     @Autowired
@@ -30,8 +30,8 @@ public class BusinessService {
 
     // Создать новую запись
     public BusinessModel create(BusinessModel businessModel) {
-        businessModel.setCreatedAt(OffsetDateTime.now()); // Устанавливаем дату создания
-        businessModel.setUpdatedAt(OffsetDateTime.now()); // Устанавливаем дату обновления
+        businessModel.setCreatedAt(now); // Устанавливаем дату создания
+        businessModel.setUpdatedAt(now); // Устанавливаем дату обновления
         return businessModelRepository.save(businessModel);
     }
 
@@ -39,7 +39,7 @@ public class BusinessService {
     public BusinessModel update(Long id, BusinessModel updatedBusinessModel) {
         if (businessModelRepository.existsById(id)) {
             updatedBusinessModel.setId(id);
-            updatedBusinessModel.setUpdatedAt(OffsetDateTime.now()); // Обновляем дату
+            updatedBusinessModel.setUpdatedAt(now); // Обновляем дату
             return businessModelRepository.save(updatedBusinessModel);
         }
         return null; // Или можно выбросить исключение
@@ -50,4 +50,3 @@ public class BusinessService {
         businessModelRepository.deleteById(id);
     }
 }
-

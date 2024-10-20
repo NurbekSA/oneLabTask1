@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class InvestorService {
-
+    Long now = System.currentTimeMillis();
     private final InvestorRepo investorRepo;
 
     @Autowired
@@ -30,8 +30,8 @@ public class InvestorService {
 
     // Создать новую запись
     public InvestorModel create(InvestorModel investorModel) {
-        investorModel.setCreatedAt(OffsetDateTime.now()); // Устанавливаем дату создания
-        investorModel.setUpdatedAt(OffsetDateTime.now()); // Устанавливаем дату обновления
+        investorModel.setCreatedAt(now); // Устанавливаем дату создания
+        investorModel.setUpdatedAt(now); // Устанавливаем дату обновления
         return investorRepo.save(investorModel);
     }
 
@@ -39,7 +39,7 @@ public class InvestorService {
     public InvestorModel update(Long id, InvestorModel updatedInvestorModel) {
         if (investorRepo.existsById(id)) {
             updatedInvestorModel.setId(id);
-            updatedInvestorModel.setUpdatedAt(OffsetDateTime.now()); // Обновляем дату
+            updatedInvestorModel.setUpdatedAt(now); // Обновляем дату
             return investorRepo.save(updatedInvestorModel);
         }
         return null; // Или можно выбросить исключение

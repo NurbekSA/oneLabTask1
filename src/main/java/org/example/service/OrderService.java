@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 public class OrderService {
-
+    Long now = System.currentTimeMillis();
     private final OrderRepo orderRepo;
 
     @Autowired
@@ -30,7 +30,7 @@ public class OrderService {
 
     // Создать новую запись
     public OrderModel create(OrderModel orderModel) {
-        orderModel.setDateOfOrder(OffsetDateTime.now()); // Устанавливаем дату заказа
+        orderModel.setDateOfOrder(now); // Устанавливаем дату заказа
         return orderRepo.save(orderModel);
     }
 
@@ -48,4 +48,3 @@ public class OrderService {
         orderRepo.deleteById(id);
     }
 }
-

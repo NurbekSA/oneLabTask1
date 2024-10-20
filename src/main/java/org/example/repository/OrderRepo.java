@@ -9,5 +9,5 @@ import java.util.List;
 @Repository
 public interface OrderRepo extends JpaRepository<OrderModel, Long> {
     // Добавьте дополнительные методы поиска, если это необходимо
-    List<OrderModel> findByCompanyId(Long companyId);
+
 }

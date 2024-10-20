@@ -10,6 +10,7 @@ import java.util.List;
 
 @Service
 public class CardService {
+    Long now = System.currentTimeMillis();
 
     private final CardRepo cardRepo;
 
@@ -30,8 +31,8 @@ public class CardService {
 
     // Создать новую запись
     public CardModel create(CardModel cardModel) {
-        cardModel.setCreatedAt(OffsetDateTime.now()); // Устанавливаем дату создания
-        cardModel.setUpdatedAt(OffsetDateTime.now()); // Устанавливаем дату обновления
+        cardModel.setCreatedAt(now); // Устанавливаем дату создания
+        cardModel.setUpdatedAt(now); // Устанавливаем дату обновления
         return cardRepo.save(cardModel);
     }
 
@@ -39,7 +40,7 @@ public class CardService {
     public CardModel update(Long id, CardModel updatedCardModel) {
         if (cardRepo.existsById(id)) {
             updatedCardModel.setId(id);
-            updatedCardModel.setUpdatedAt(OffsetDateTime.now()); // Обновляем дату
+            updatedCardModel.setUpdatedAt(now); // Обновляем дату
             return cardRepo.save(updatedCardModel);
         }
         return null; // Или можно выбросить исключение
