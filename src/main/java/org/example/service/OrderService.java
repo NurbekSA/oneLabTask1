@@ -3,9 +3,10 @@ package org.example.service;
 import org.example.model.OrderModel;
 import org.example.repository.OrderRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -18,33 +19,22 @@ public class OrderService {
         this.orderRepo = orderRepo;
     }
 
-    // Получить все записи
-    public List<OrderModel> findAll() {
-        return orderRepo.findAll();
+    public ResponseEntity<List<OrderModel>> findAll() {
+        List<OrderModel> orders = orderRepo.findAll();
+        return ResponseEntity.ok(orders);
     }
 
-    // Получить запись по ID
-    public OrderModel findById(Long id) {
-        return orderRepo.findById(id).orElse(null);
-    }
-
-    // Создать новую запись
-    public OrderModel create(OrderModel orderModel) {
-        orderModel.setDateOfOrder(now); // Устанавливаем дату заказа
-        return orderRepo.save(orderModel);
-    }
-
-    // Обновить существующую запись
-    public OrderModel update(Long id, OrderModel updatedOrderModel) {
-        if (orderRepo.existsById(id)) {
-            updatedOrderModel.setId(id);
-            return orderRepo.save(updatedOrderModel);
+    public ResponseEntity<OrderModel> findById(Long id) {
+        OrderModel orderModel = orderRepo.findById(id).orElse(null);
+        if (orderModel == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        return null; // Или можно выбросить исключение
+        return ResponseEntity.ok(orderModel);
     }
 
-    // Удалить запись
-    public void delete(Long id) {
-        orderRepo.deleteById(id);
+    public ResponseEntity<?> create(OrderModel orderModel) {
+        orderModel.setDateOfOrder(now); // Устанавливаем дату заказа
+        OrderModel savedOrder = orderRepo.save(orderModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedOrder);
     }
 }

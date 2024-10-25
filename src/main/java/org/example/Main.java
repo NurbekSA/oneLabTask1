@@ -1,28 +1,33 @@
 package org.example;
 
+import org.example.model.InvestmentModel;
 import org.example.model.InvestorModel;
 import org.example.model.OrderModel;
-import org.example.repository.AdminRepo;
-import org.example.repository.InvestorRepo; // Замените на ваш путь к репозиторию
-import org.example.repository.OrderRepo; // Замените на ваш путь к репозиторию
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.service.InvestmentService;
+import org.example.service.InvestorService;
+import org.example.service.OrderService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Scanner;
 
 @SpringBootApplication
 public class Main implements CommandLineRunner{
 
-    @Autowired
-    private InvestorRepo investorRepo; // Репозиторий для инвесторов
+    private InvestorService investorService; // Репозиторий для инвесторов
 
-    @Autowired
-    private OrderRepo orderRepo; // Репозиторий для заказов
+    private OrderService orderService; // Репозиторий для заказов
+
+    private InvestmentService investmentService;
+
+    public Main(InvestorService investorService, OrderService orderService, InvestmentService investmentService) {
+        this.investorService = investorService;
+        this.orderService = orderService;
+        this.investmentService = investmentService;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
@@ -31,25 +36,13 @@ public class Main implements CommandLineRunner{
 
     @Override
     public void run(String... args){
-        while (true) {
-            Scanner scanner = new Scanner(System.in);
 
-            System.out.println("Введите ИИН (в бд есть: 123456789, 987654321, 12345678910): ");
-            String iin = scanner.nextLine();
-            InvestorModel investor = investorRepo.findByIin(iin);
+        CreatInvestment(new InvestmentModel(1L, (InvestorModel)investorService.findById(1l).getBody(),(OrderModel) orderService.findById(1l).getBody(), true, false, true, new BigDecimal("1000.00"), System.currentTimeMillis()), "credeltial");
 
-            if (investor != null) {
-                System.out.println("Инвестор найден: " + investor.getMail());
-            } else {
-                System.out.println("Инвестор с таким ИИН не найден.");
-            }
+    }
 
-
-
-
-
-
-        }
+    public void CreatInvestment(InvestmentModel investment, String credential){
+        ResponseEntity<?> response = investmentService.create(investment);
     }
 
 }

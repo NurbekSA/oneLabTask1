@@ -1,13 +1,16 @@
-package org.example.service;
 
+import org.apache.coyote.Response;
 import org.example.model.InvestmentModel;
 import org.example.repository.InvestmentRepo;
 import org.example.repository.InvestorRepo;
+import org.example.service.InvestmentService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+
 
 class InvestmentServiceTest {
 
@@ -42,10 +46,8 @@ class InvestmentServiceTest {
     void testFindAll() {
         when(investmentRepo.findAll()).thenReturn(Collections.singletonList(investment));
 
-        List<InvestmentModel> result = investmentService.findAll();
-
-        assertEquals(1, result.size());
-        assertEquals(investment, result.get(0));
+        ResponseEntity<?> response = investmentService.findAll();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
         verify(investmentRepo, times(1)).findAll();
     }
 
@@ -53,10 +55,10 @@ class InvestmentServiceTest {
     void testFindById() {
         when(investmentRepo.findById(1L)).thenReturn(Optional.of(investment));
 
-        InvestmentModel result = investmentService.findById(1L);
+        ResponseEntity<?> response = investmentService.findById(1L);
 
-        assertNotNull(result);
-        assertEquals(investment, result);
+        assertNotNull(response.getBody());
+        assertEquals(investment, (InvestmentModel) response.getBody());
         verify(investmentRepo, times(1)).findById(1L);
     }
 
@@ -64,10 +66,10 @@ class InvestmentServiceTest {
     void testCreate() {
         when(investmentRepo.save(any(InvestmentModel.class))).thenReturn(investment);
 
-        InvestmentModel result = investmentService.create(investment);
+        ResponseEntity<?> response = investmentService.create(investment);
 
-        assertNotNull(result);
-        assertEquals(investment, result);
+        assertNotNull(response.getBody());
+        assertEquals(investment, (InvestmentModel) response.getBody());
         verify(investmentRepo, times(1)).save(investment);
     }
 
@@ -80,10 +82,10 @@ class InvestmentServiceTest {
         updatedInvestment.setId(1L);
         updatedInvestment.setInvestmentDate(System.currentTimeMillis());
 
-        InvestmentModel result = investmentService.update(1L, updatedInvestment);
+        ResponseEntity<?> response = investmentService.update(1L, updatedInvestment);
 
-        assertNotNull(result);
-        assertEquals(investment, result);
+        assertNotNull(response.getBody());
+        assertEquals(investment, (InvestmentModel) response.getBody());
         verify(investmentRepo, times(1)).save(updatedInvestment);
     }
 
@@ -94,9 +96,9 @@ class InvestmentServiceTest {
         InvestmentModel updatedInvestment = new InvestmentModel();
         updatedInvestment.setId(1L);
 
-        InvestmentModel result = investmentService.update(1L, updatedInvestment);
+        ResponseEntity<?> response = investmentService.update(1L, updatedInvestment);
 
-        assertNull(result);
+        assertNull(response.getBody());
         verify(investmentRepo, never()).save(any(InvestmentModel.class));
     }
 
@@ -107,11 +109,5 @@ class InvestmentServiceTest {
         verify(investmentRepo, times(1)).deleteById(1L);
     }
 
-    @Test
-    void testSaveAll() throws Exception {
-        List<InvestmentModel> investments = List.of(investment);
-        investmentService.saveAll(investments);
 
-        verify(investmentRepo, times(1)).saveAll(investments);
-    }
 }

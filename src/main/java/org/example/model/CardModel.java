@@ -4,10 +4,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.OffsetDateTime;
 
@@ -17,8 +14,9 @@ import jakarta.persistence.*;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+
 public class CardModel {
 
     @Id
@@ -34,6 +32,4 @@ public class CardModel {
     private String expiryDate;
     private long createdAt;
     private long updatedAt;
-
-    // Конструктор, геттеры и сеттеры
 }

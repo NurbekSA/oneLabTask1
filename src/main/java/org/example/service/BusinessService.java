@@ -3,50 +3,42 @@ package org.example.service;
 import org.example.model.BusinessModel;
 import org.example.repository.BusinessRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
 public class BusinessService {
-    Long now = System.currentTimeMillis();
-    private final BusinessRepo businessModelRepository;
+    private final BusinessRepo businessRepo;
 
     @Autowired
     public BusinessService(BusinessRepo businessModelRepository) {
-        this.businessModelRepository = businessModelRepository;
+        this.businessRepo = businessModelRepository;
     }
 
     // Получить все записи
-    public List<BusinessModel> findAll() {
-        return businessModelRepository.findAll();
+    public ResponseEntity<List<BusinessModel>> findAll() {
+        List<BusinessModel> businesses = businessRepo.findAll();
+        return ResponseEntity.ok(businesses);
     }
 
     // Получить запись по ID
-    public BusinessModel findById(Long id) {
-        return businessModelRepository.findById(id).orElse(null);
+    public ResponseEntity<BusinessModel> findById(Long id) {
+        BusinessModel businessModel = businessRepo.findById(id).orElse(null);
+        if (businessModel == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(businessModel);
     }
 
     // Создать новую запись
-    public BusinessModel create(BusinessModel businessModel) {
-        businessModel.setCreatedAt(now); // Устанавливаем дату создания
-        businessModel.setUpdatedAt(now); // Устанавливаем дату обновления
-        return businessModelRepository.save(businessModel);
+    public ResponseEntity<?> create(BusinessModel businessModel) {
+        businessModel.setCreatedAt(System.currentTimeMillis()); // Устанавливаем дату создания
+        businessModel.setUpdatedAt(System.currentTimeMillis()); // Устанавливаем дату обновления
+        BusinessModel savedBusiness = businessRepo.save(businessModel);
+        return ResponseEntity.ok(savedBusiness);
     }
 
-    // Обновить существующую запись
-    public BusinessModel update(Long id, BusinessModel updatedBusinessModel) {
-        if (businessModelRepository.existsById(id)) {
-            updatedBusinessModel.setId(id);
-            updatedBusinessModel.setUpdatedAt(now); // Обновляем дату
-            return businessModelRepository.save(updatedBusinessModel);
-        }
-        return null; // Или можно выбросить исключение
-    }
-
-    // Удалить запись
-    public void delete(Long id) {
-        businessModelRepository.deleteById(id);
-    }
 }
