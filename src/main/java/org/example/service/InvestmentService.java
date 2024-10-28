@@ -64,8 +64,6 @@ public class InvestmentService {
 
         investmentRepo.save(investment);
         logger.info("Инвестиция успешно сохранена в БД");
-        //kafkaSenderService.sendMessage("payment-topic","key1", "Сообщение для партиции 0");
-        logger.info("Оправлено запрос на оплату");
         return ResponseEntity.ok(investment);
     }
 

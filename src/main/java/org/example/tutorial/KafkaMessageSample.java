@@ -5,8 +5,8 @@
 
 package org.example.tutorial;
 
-public final class kafkaMessageSample {
-  private kafkaMessageSample() {}
+public final class KafkaMessageSample {
+  private KafkaMessageSample() {}
   static {
     com.google.protobuf.RuntimeVersion.validateProtobufGencodeVersion(
       com.google.protobuf.RuntimeVersion.RuntimeDomain.PUBLIC,
@@ -14,7 +14,7 @@ public final class kafkaMessageSample {
       /* minor= */ 28,
       /* patch= */ 3,
       /* suffix= */ "",
-      kafkaMessageSample.class.getName());
+      KafkaMessageSample.class.getName());
   }
   public static void registerAllExtensions(
       com.google.protobuf.ExtensionRegistryLite registry) {
@@ -26,10 +26,10 @@ public final class kafkaMessageSample {
         (com.google.protobuf.ExtensionRegistryLite) registry);
   }
   static final com.google.protobuf.Descriptors.Descriptor
-    internal_static_tutorial_kafkaMessage_descriptor;
+    internal_static_tutorial_KafkaMessage_descriptor;
   static final 
     com.google.protobuf.GeneratedMessage.FieldAccessorTable
-      internal_static_tutorial_kafkaMessage_fieldAccessorTable;
+      internal_static_tutorial_KafkaMessage_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -40,21 +40,25 @@ public final class kafkaMessageSample {
   static {
     java.lang.String[] descriptorData = {
       "\n-src/main/java/org/example/proto/messag" +
-      "e.proto\022\010tutorial\"S\n\014kafkaMessage\022\n\n\002id\030" +
-      "\001 \001(\t\"7\n\tPhoneType\022\t\n\005CREAT\020\000\022\007\n\003GET\020\001\022\n" +
-      "\n\006UPDATE\020\002\022\n\n\006DELETE\020\003B\026B\022kafkaMessageSa" +
-      "mpleP\001b\006proto3"
+      "e.proto\022\010tutorial\"\212\002\n\014KafkaMessage\022\n\n\002id" +
+      "\030\001 \001(\t\0228\n\014request_type\030\002 \001(\0162\".tutorial." +
+      "KafkaMessage.RequestType\0226\n\013methos_type\030" +
+      "\003 \001(\0162!.tutorial.KafkaMessage.MethodType" +
+      "\022\014\n\004body\030\004 \001(\t\"4\n\013RequestType\022\014\n\010RESPONS" +
+      "E\020\000\022\n\n\006NOTIFY\020\001\022\013\n\007REQUEST\020\003\"8\n\nMethodTy" +
+      "pe\022\t\n\005CREAT\020\000\022\007\n\003GET\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DE" +
+      "LETE\020\003B\026B\022KafkaMessageSampleP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
         new com.google.protobuf.Descriptors.FileDescriptor[] {
         });
-    internal_static_tutorial_kafkaMessage_descriptor =
+    internal_static_tutorial_KafkaMessage_descriptor =
       getDescriptor().getMessageTypes().get(0);
-    internal_static_tutorial_kafkaMessage_fieldAccessorTable = new
+    internal_static_tutorial_KafkaMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
-        internal_static_tutorial_kafkaMessage_descriptor,
-        new java.lang.String[] { "Id", });
+        internal_static_tutorial_KafkaMessage_descriptor,
+        new java.lang.String[] { "Id", "RequestType", "MethosType", "Body", });
     descriptor.resolveAllFeaturesImmutable();
   }
 

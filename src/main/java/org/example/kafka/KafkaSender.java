@@ -1,6 +1,6 @@
 package org.example.kafka;
 
-import org.example.tutorial.kafkaMessage;
+import org.example.tutorial.KafkaMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -15,7 +15,7 @@ public class KafkaSender {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMessage(String topicName, String key, kafkaMessage message) {
+    public void sendMessage(String topicName, String key, KafkaMessage message) {
         byte[] messageBytes = message.toByteArray();
         kafkaTemplate.send(topicName,key, messageBytes);
         System.out.println("Отправлено сообщение: " + message + " с ключом: " + key);
