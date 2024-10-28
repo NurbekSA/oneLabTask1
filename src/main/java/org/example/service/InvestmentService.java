@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.kafka.KafkaSender;
 import org.example.model.InvestmentModel;
 import org.example.model.InvestorModel;
 import org.example.repository.InvestmentRepo;
@@ -9,21 +10,23 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
+@EnableTransactionManagement
 public class InvestmentService {
     private static final Logger logger = LoggerFactory.getLogger(InvestmentService.class);
     private final InvestmentRepo investmentRepo;
-
     private final InvestorService investorService;
-
-    public InvestmentService(InvestmentRepo investmentRepo, @Lazy InvestorService investorService) {
+   private final KafkaSender kafkaSenderService;
+    public InvestmentService(InvestmentRepo investmentRepo, @Lazy InvestorService investorService, KafkaSender kafkaSenderService) {
         this.investmentRepo = investmentRepo;
         this.investorService = investorService;
+        this.kafkaSenderService = kafkaSenderService;
     }
 
     public ResponseEntity<?> findAll() {
@@ -43,16 +46,14 @@ public class InvestmentService {
     }
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public ResponseEntity<?> create(InvestmentModel investment) {
-
-        ResponseEntity<?> response = investorService.findById(investment.getId());
+        ResponseEntity<?> response = investorService.findById(investment.getInvestor().getId());
         if (response.getStatusCode() != HttpStatus.OK)
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getBody());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Не удалось найти инвестора");
 
         InvestorModel investor = (InvestorModel)response.getBody();
 
         if (!investor.getIsChecked())
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Инвестор не прошёл проверку.");
-
         if (investor.getCards() == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Карта не привязана");
 
@@ -62,11 +63,9 @@ public class InvestmentService {
         investment.setInvestmentDate(System.currentTimeMillis());
 
         investmentRepo.save(investment);
-
         logger.info("Инвестиция успешно сохранена в БД");
-
-        // todo: sending a payment request
-
+        //kafkaSenderService.sendMessage("payment-topic","key1", "Сообщение для партиции 0");
+        logger.info("Оправлено запрос на оплату");
         return ResponseEntity.ok(investment);
     }
 

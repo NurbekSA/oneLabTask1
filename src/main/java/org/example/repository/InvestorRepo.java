@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 public interface InvestorRepo extends JpaRepository<InvestorModel, Long> {
     // Добавьте дополнительные методы поиска, если это необходимо
     InvestorModel findByIin(String iin);
+
 }
 

@@ -24,6 +24,7 @@ public class InvestorService {
     }
 
     public ResponseEntity<InvestorModel> findById(Long id) {
+        System.out.println("id ---> " + id);
         InvestorModel investorModel = investorRepo.findById(id).orElse(null);
         if (investorModel == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -33,6 +34,7 @@ public class InvestorService {
 
     // Создать новую запись
     public ResponseEntity<?> create(InvestorModel investorModel) {
+        investorModel.setIsChecked(true); //todo: При реальном запуске нужно поменять на false
         investorModel.setCreatedAt(now); // Устанавливаем дату создания
         investorModel.setUpdatedAt(now); // Устанавливаем дату обновления
         InvestorModel savedInvestor = investorRepo.save(investorModel);

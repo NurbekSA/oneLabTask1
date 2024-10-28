@@ -2,8 +2,6 @@ package org.example;
 
 import org.example.model.*;
 import org.example.repository.*;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -15,14 +13,26 @@ import java.util.List;
 
 @Component
 public class DataLoader {
+    private BusinessRepo businessRepo;
+    private CardRepo cardRepo;
+    private InvestmentRepo investmentRepo;
+    private InvestorRepo investorRepo;
+    private OrderRepo orderRepo;
 
-    @Bean
-    String initDatabase(BusinessRepo businessRepo, CardRepo cardRepo,
-                                   InvestmentRepo investmentRepo, InvestorRepo investorRepo,
-                                   OrderRepo orderRepo) {
+    public DataLoader(BusinessRepo businessRepo, CardRepo cardRepo, InvestmentRepo investmentRepo, InvestorRepo investorRepo, OrderRepo orderRepo) {
+        this.businessRepo = businessRepo;
+        this.cardRepo = cardRepo;
+        this.investmentRepo = investmentRepo;
+        this.investorRepo = investorRepo;
+        this.orderRepo = orderRepo;
+    }
+
+
+    public void initDatabase() {
         long now = System.currentTimeMillis();
 
 
+        System.out.println("Data Loader working ---1");
         // Инициализация бизнес-модели
         BusinessModel business = new BusinessModel(null, null, "Example Corp", "123456789",
                 "123 Business St", "Credit Card",
@@ -34,12 +44,12 @@ public class DataLoader {
 
         // Имитация регистрации инвесторов
         List<InvestorModel> investors = Arrays.asList(
-                new InvestorModel(null, null, null, false,new BigDecimal("10.0"),
+                new InvestorModel(null, null, null, true,new BigDecimal("10.0"),
                         "123456789", "John Doe", "+77011234567",
-                        "john@example.com", "Address 1", "individual", now, now),
-                new InvestorModel(null, null, null, false,new BigDecimal("15.0"),
+                        "Nurbek@example.com", "Address 1", "individual", now, now),
+                new InvestorModel(null, null, null, true,new BigDecimal("15.0"),
                         "987654321", "Jane Smith", "+77019876543",
-                        "jane@example.com", "Address 2", "corporate", now, now)
+                        "Nurdaulet@example.com", "Address 2", "corporate", now, now)
         );
         investorRepo.saveAll(investors);
 
@@ -69,6 +79,5 @@ public class DataLoader {
                         new BigDecimal("1000.00"), now)
         );
         investmentRepo.saveAll(investments);
-        return "";
     }
 }
