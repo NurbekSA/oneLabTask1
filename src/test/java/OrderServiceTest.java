@@ -15,7 +15,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class OrderServiceTest {
@@ -82,5 +84,57 @@ class OrderServiceTest {
         ResponseEntity<?> response = orderService.create(orderModel);
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(orderModel, response.getBody());
+    }
+
+
+    @Test
+    void testFindAll_EmptyList() {
+        when(orderRepo.findAll()).thenReturn(Collections.emptyList());
+
+        ResponseEntity<List<OrderModel>> response = orderService.findAll();
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(0, response.getBody().size());
+    }
+
+    @Test
+    void testCreate_SetsDateOfOrder() {
+        when(orderRepo.save(any(OrderModel.class))).thenAnswer(invocation -> {
+            OrderModel order = invocation.getArgument(0);
+            order.setDateOfOrder(System.currentTimeMillis());
+            return order;
+        });
+
+        ResponseEntity<?> response = orderService.create(orderModel);
+        OrderModel savedOrder = (OrderModel) response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(savedOrder.getDateOfOrder());
+    }
+
+    @Test
+    void testCreate_VerifySaveInvocation() {
+        orderService.create(orderModel);
+        verify(orderRepo).save(orderModel);
+    }
+
+    @Test
+    void testFindById_InvalidId() {
+        ResponseEntity<OrderModel> response = orderService.findById(-1L);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testFindById_NullId() {
+        ResponseEntity<OrderModel> response = orderService.findById(null);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testCreateWithSpecificCurrency() {
+        orderModel.setCurrency("USD");
+        when(orderRepo.save(any(OrderModel.class))).thenReturn(orderModel);
+
+        ResponseEntity<?> response = orderService.create(orderModel);
+        OrderModel savedOrder = (OrderModel) response.getBody();
+        assertEquals("USD", savedOrder.getCurrency());
     }
 }

@@ -14,7 +14,9 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class InvestorServiceTest {
@@ -69,4 +71,58 @@ class InvestorServiceTest {
         assertEquals(HttpStatus.CREATED, response.getStatusCode());
         assertEquals(investorModel, response.getBody());
     }
+    @Test
+    void testFindById_ReturnsCorrectData() {
+        when(investorRepo.findById(1L)).thenReturn(Optional.of(investorModel));
+
+        ResponseEntity<InvestorModel> response = investorService.findById(1L);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("123456789012", response.getBody().getIin());
+        assertEquals("John Doe", response.getBody().getFio());
+        assertEquals(BigDecimal.valueOf(1000), response.getBody().getScore());
+    }
+
+    @Test
+    void testCreate_SetsTimestamps() {
+        when(investorRepo.save(any(InvestorModel.class))).thenAnswer(invocation -> {
+            InvestorModel model = invocation.getArgument(0);
+            model.setCreatedAt(System.currentTimeMillis());
+            model.setUpdatedAt(System.currentTimeMillis());
+            return model;
+        });
+
+        ResponseEntity<?> response = investorService.create(investorModel);
+        InvestorModel savedInvestor = (InvestorModel) response.getBody();
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertNotNull(savedInvestor.getCreatedAt());
+        assertNotNull(savedInvestor.getUpdatedAt());
+    }
+
+    @Test
+    void testCreate_VerifySaveInvocation() {
+        investorService.create(investorModel);
+        verify(investorRepo).save(investorModel);
+    }
+
+    @Test
+    void testFindById_InvalidId() {
+        ResponseEntity<InvestorModel> response = investorService.findById(-1L);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testFindById_NullId() {
+        ResponseEntity<InvestorModel> response = investorService.findById(null);
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    void testScoreIsCorrectAfterCreation() {
+        when(investorRepo.save(any(InvestorModel.class))).thenReturn(investorModel);
+
+        ResponseEntity<?> response = investorService.create(investorModel);
+        InvestorModel savedInvestor = (InvestorModel) response.getBody();
+        assertEquals(BigDecimal.valueOf(1000), savedInvestor.getScore());
+    }
+
 }
