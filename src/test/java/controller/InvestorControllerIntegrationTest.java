@@ -1,11 +1,11 @@
 package controller;
 
+
 import org.example.Main;
 import org.example.config.SecurityConfig;
 import org.example.config.jwt.JwtUtil;
-import org.example.controller.AuthController;
 import org.example.model.AuthRequest;
-import org.example.model.BusinessModel;
+import org.example.model.InvestorModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,23 +13,22 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
+import org.example.controller.InvestorController;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
-@ContextConfiguration(classes = {AuthController.class, JwtUtil.class, SecurityConfig.class})
+@ContextConfiguration(classes = {InvestorController.class, JwtUtil.class, SecurityConfig.class})
 @ComponentScan(basePackages = "org.example")
-public class BusinessControllerIntegrationTest {
+public class InvestorControllerIntegrationTest {
 
     @LocalServerPort
     private int port;
@@ -53,67 +52,54 @@ public class BusinessControllerIntegrationTest {
 
         assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
         assertThat(response.getHeaders().get("Set-Cookie")).isNotEmpty();
-        assertThat(response.getHeaders().get("Set-Cookie").get(0)).contains("jwtToken");
-
 
         List<String> cookies = response.getHeaders().get("Set-Cookie");
-
-        assertThat(cookies).isNotEmpty();
-
         jwtToken = cookies.stream()
                 .filter(cookie -> cookie.startsWith("jwtToken"))
                 .findFirst()
                 .orElseThrow(() -> new RuntimeException("JWT Token not found"));
-
-        System.out.println("4444");
     }
 
-
-
-
-//    @Test
-//    public void testGetAllBusinesses() {
-//
-//        String url = "http://localhost:" + port + "/business";
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Cookie", jwtToken);
-//        HttpEntity<Void> request = new HttpEntity<>(headers);
-//
-//        ResponseEntity<BusinessModel[]> response = restTemplate.exchange(url, HttpMethod.GET, request, BusinessModel[].class);
-//
-//        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-//        assertThat(response.getBody()).isNotNull();
-//    }
-
-
     @Test
-    @Transactional
-    public void testCreateBusiness() {
-        String url = "http://localhost:" + port + "/business";
+    public void testGetInvestorById() {
+        Long investorId = 1L; // Replace with an actual investor ID if available in your test data
+        String url = "http://localhost:" + port + "/investor/" + investorId;
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("Cookie", jwtToken);
+        HttpEntity<Void> request = new HttpEntity<>(headers);
 
-        BusinessModel businessModel = new BusinessModel();
-        businessModel.setDirectorNumber("1234567890");
-        businessModel.setDirectorMail("director@example.com");
-        businessModel.setIsCheked("Yes");
-        businessModel.setDirectorFIO("John Doe");
-        businessModel.setDirectorIIN("123456789012");
-        businessModel.setCompanyName("Example Company");
-        businessModel.setCompanyBIN("123456789");
-        businessModel.setAddress("123 Example St");
-        businessModel.setTypeOfPaymentSystem("Credit Card");
-        businessModel.setSector("Retail");
-        businessModel.setDateOfBusinessStarted(System.currentTimeMillis());
-        businessModel.setCreatedAt(System.currentTimeMillis());
-        businessModel.setUpdatedAt(System.currentTimeMillis());
+        ResponseEntity<InvestorModel> response = restTemplate.exchange(url, HttpMethod.GET, request, InvestorModel.class);
 
-        HttpEntity<BusinessModel> request = new HttpEntity<>(businessModel, headers);
+        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(response.getBody()).isNotNull();
+    }
+
+    @Test
+    @Transactional
+    public void testCreateInvestor() {
+        String url = "http://localhost:" + port + "/investor";
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Cookie", jwtToken);
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        InvestorModel investorModel = new InvestorModel();
+        investorModel.setMail("investor@example.com");
+        investorModel.setPhoneNumber("1234567890");
+        investorModel.setIsChecked(true);
+        investorModel.setScore(new BigDecimal("7500.00"));
+        investorModel.setIin("123456789012");
+        investorModel.setFio("John Doe");
+        investorModel.setAddress("123 Investment St");
+        investorModel.setInvestorType("Individual");
+        investorModel.setCreatedAt(System.currentTimeMillis());
+        investorModel.setUpdatedAt(System.currentTimeMillis());
+
+        HttpEntity<InvestorModel> request = new HttpEntity<>(investorModel, headers);
 
         ResponseEntity<?> response = restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
 
-        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
     }
 }

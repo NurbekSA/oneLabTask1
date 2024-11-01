@@ -13,8 +13,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,25 +26,20 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        System.out.println("11111");
-
         String token = null;
         Cookie[] cookies = request.getCookies();
 
-        System.out.println("22222");
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if ("jwtToken".equals(cookie.getName())) {
                     token = cookie.getValue();
-                    System.out.println("33333" + token);
+                    break;  // Прекращаем цикл после нахождения нужного токена
                 }
             }
         }
 
         if (token != null) {
             String username = jwtUtil.extractUsername(token);
-
-            System.out.println("44444" + username);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 if (jwtUtil.isTokenValid(token)) {

@@ -32,7 +32,7 @@ public class OrderService {
         return ResponseEntity.ok(orderModel);
     }
 
-    public ResponseEntity<?> create(OrderModel orderModel) {
+    public ResponseEntity<OrderModel> create(OrderModel orderModel) {
         orderModel.setDateOfOrder(now); // Устанавливаем дату заказа
         OrderModel savedOrder = orderRepo.save(orderModel);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedOrder);
