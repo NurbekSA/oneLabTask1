@@ -1,3 +1,5 @@
+package service;
+
 import org.example.model.CardModel;
 import org.example.model.InvestorModel;
 import org.example.repository.CardRepo;

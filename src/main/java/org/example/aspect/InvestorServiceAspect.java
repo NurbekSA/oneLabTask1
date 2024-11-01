@@ -1,4 +1,4 @@
-package org.example;
+package org.example.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Aspect
 @Component
-public class InvestorAspect {
+public class InvestorServiceAspect {
 
     @Autowired
     private InvestmentRepo investmentRepo;

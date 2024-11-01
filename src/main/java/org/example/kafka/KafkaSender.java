@@ -1,6 +1,6 @@
 package org.example.kafka;
 
-import org.example.tutorial.KafkaMessage;
+import org.example.proto.tutorial.KafkaMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.KafkaTemplate;

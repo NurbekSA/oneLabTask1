@@ -2,7 +2,7 @@ package org.example.kafka;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.example.tutorial.KafkaMessage;
+import org.example.proto.tutorial.KafkaMessage;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 

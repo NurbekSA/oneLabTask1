@@ -24,7 +24,6 @@ public class InvestorService {
     }
 
     public ResponseEntity<InvestorModel> findById(Long id) {
-        System.out.println("id ---> " + id);
         InvestorModel investorModel = investorRepo.findById(id).orElse(null);
         if (investorModel == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);

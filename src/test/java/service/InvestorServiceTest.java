@@ -1,3 +1,4 @@
+package service;
 
 import org.example.model.InvestorModel;
 import org.example.repository.InvestorRepo;

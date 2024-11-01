@@ -1,6 +1,5 @@
     package org.example.service;
 
-    import org.example.kafka.KafkaSender;
     import org.example.model.InvestmentModel;
     import org.example.model.InvestorModel;
     import org.example.repository.InvestmentRepo;
@@ -22,16 +21,14 @@
         private static final Logger logger = LoggerFactory.getLogger(InvestmentService.class);
         private final InvestmentRepo investmentRepo;
         private final InvestorService investorService;
-       private final KafkaSender kafkaSenderService;
-        public InvestmentService(InvestmentRepo investmentRepo, @Lazy InvestorService investorService, KafkaSender kafkaSenderService) {
+        public InvestmentService(InvestmentRepo investmentRepo, @Lazy InvestorService investorService) {
             this.investmentRepo = investmentRepo;
             this.investorService = investorService;
-            this.kafkaSenderService = kafkaSenderService;
         }
 
         public ResponseEntity<?> findAll() {
             List<InvestmentModel> investments = investmentRepo.findAll();
-            if (investments == null)
+            if (investments.isEmpty())
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 
             return ResponseEntity.ok(investments);

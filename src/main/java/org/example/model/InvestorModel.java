@@ -1,5 +1,6 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,10 +9,10 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @Entity
-@Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 
 public class InvestorModel {
     @Id
@@ -19,18 +20,17 @@ public class InvestorModel {
     private Long id;
 
     @OneToMany(mappedBy = "investor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<CardModel> cards;
     @OneToMany(mappedBy = "investor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<InvestmentModel> investment;
-
+    private String mail;
+    private String phoneNumber;
     private Boolean isChecked;
-
     private BigDecimal score;
-
     private String iin;
     private String fio;
-    private String phoneNumber;
-    private String mail;
     private String address;
     private String investorType;
     private Long createdAt;

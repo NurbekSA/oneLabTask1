@@ -1,4 +1,4 @@
-import org.example.kafka.KafkaSender;
+package service;//import org.example.kafka.KafkaSender;
 import org.example.model.InvestmentModel;
 import org.example.model.InvestorModel;
 import org.example.model.OrderModel;
@@ -30,8 +30,7 @@ class InvestmentServiceTest {
     @Mock
     private InvestorService investorService;
 
-    @Mock
-    private KafkaSender kafkaSenderService;
+
 
     @InjectMocks
     private InvestmentService investmentService;
@@ -76,8 +75,8 @@ class InvestmentServiceTest {
         when(investmentRepo.findAll()).thenReturn(Collections.emptyList());
 
         ResponseEntity<?> response = investmentService.findAll();
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(0, ((List<?>) response.getBody()).size());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(null, response.getBody());
     }
 
     @Test

@@ -12,10 +12,10 @@ import java.time.OffsetDateTime;
 import jakarta.persistence.*;
 
 @Entity
-@Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 
 public class CardModel {
 

@@ -1,3 +1,5 @@
+package service;
+
 import org.example.model.OrderModel;
 import org.example.repository.OrderRepo;
 import org.example.service.OrderService;
@@ -33,7 +35,7 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        orderModel = new OrderModel(null, null, null, true, true, "EQUITY", new BigDecimal("10000.00"), new BigDecimal("5000.00"), "USD", System.currentTimeMillis(), System.currentTimeMillis() + 604800000L, "PENDING", "Business Expansion", "Expansion of operations to new regions", "Real Estate", "null");
+        orderModel = new OrderModel();
         orderModel.setId(1L);
         orderModel.setInvestmentType("Equity");
         orderModel.setTargetAmount(BigDecimal.valueOf(10000));
@@ -41,7 +43,6 @@ class OrderServiceTest {
         orderModel.setCurrency("USD");
         orderModel.setDateOfOrder(System.currentTimeMillis());
         orderModel.setDueDate(System.currentTimeMillis() + 86400000); // 1 день позже
-        orderModel.setStatus("Pending");
         orderModel.setPurpose("Investing in startup");
         orderModel.setDescription("Initial order for investment");
         orderModel.setCollateral("None");

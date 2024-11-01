@@ -9,8 +9,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 
 public class BusinessModel {
     @Id
@@ -18,16 +18,18 @@ public class BusinessModel {
     private Long id;
     @OneToMany(mappedBy = "business", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<OrderModel> orders;
+    private String directorNumber;
+    private String directorMail;
+    private String isCheked;
+    private String directorFIO;
+    private String directorIIN;
+
     private String companyName;
     private String companyBIN;
     private String address;
     private String typeOfPaymentSystem;
     private String sector;
     private Long dateOfBusinessStarted;
-    private String directorFIO;
-    private String directorIIN;
-    private String directorNumber;
-    private String directorMail;
     private Long createdAt;
     private Long updatedAt;
 }

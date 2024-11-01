@@ -3,7 +3,7 @@
 // source: src/main/java/org/example/proto/message.proto
 // Protobuf Java Version: 4.28.3
 
-package org.example.tutorial;
+package org.example.proto.tutorial;
 
 public interface KafkaMessageOrBuilder extends
     // @@protoc_insertion_point(interface_extends:tutorial.KafkaMessage)
@@ -54,4 +54,16 @@ public interface KafkaMessageOrBuilder extends
    */
   com.google.protobuf.ByteString
       getBodyBytes();
+
+  /**
+   * <code>string reply_to = 5;</code>
+   * @return The replyTo.
+   */
+  java.lang.String getReplyTo();
+  /**
+   * <code>string reply_to = 5;</code>
+   * @return The bytes for replyTo.
+   */
+  com.google.protobuf.ByteString
+      getReplyToBytes();
 }

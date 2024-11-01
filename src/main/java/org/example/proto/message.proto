@@ -23,4 +23,6 @@ message KafkaMessage {
   RequestType request_type = 2;
   MethodType methos_type = 3;
   string body = 4;
+  string reply_to = 5;
+
 }

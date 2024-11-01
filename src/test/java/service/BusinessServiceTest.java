@@ -1,3 +1,5 @@
+package service;
+
 import org.example.Main;
 import org.example.model.BusinessModel;
 import org.example.repository.BusinessRepo;

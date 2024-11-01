@@ -3,7 +3,7 @@
 // source: src/main/java/org/example/proto/message.proto
 // Protobuf Java Version: 4.28.3
 
-package org.example.tutorial;
+package org.example.proto.tutorial;
 
 public final class KafkaMessageSample {
   private KafkaMessageSample() {}
@@ -40,14 +40,15 @@ public final class KafkaMessageSample {
   static {
     java.lang.String[] descriptorData = {
       "\n-src/main/java/org/example/proto/messag" +
-      "e.proto\022\010tutorial\"\212\002\n\014KafkaMessage\022\n\n\002id" +
+      "e.proto\022\010tutorial\"\234\002\n\014KafkaMessage\022\n\n\002id" +
       "\030\001 \001(\t\0228\n\014request_type\030\002 \001(\0162\".tutorial." +
       "KafkaMessage.RequestType\0226\n\013methos_type\030" +
       "\003 \001(\0162!.tutorial.KafkaMessage.MethodType" +
-      "\022\014\n\004body\030\004 \001(\t\"4\n\013RequestType\022\014\n\010RESPONS" +
-      "E\020\000\022\n\n\006NOTIFY\020\001\022\013\n\007REQUEST\020\003\"8\n\nMethodTy" +
-      "pe\022\t\n\005CREAT\020\000\022\007\n\003GET\020\001\022\n\n\006UPDATE\020\002\022\n\n\006DE" +
-      "LETE\020\003B\026B\022KafkaMessageSampleP\001b\006proto3"
+      "\022\014\n\004body\030\004 \001(\t\022\020\n\010reply_to\030\005 \001(\t\"4\n\013Requ" +
+      "estType\022\014\n\010RESPONSE\020\000\022\n\n\006NOTIFY\020\001\022\013\n\007REQ" +
+      "UEST\020\003\"8\n\nMethodType\022\t\n\005CREAT\020\000\022\007\n\003GET\020\001" +
+      "\022\n\n\006UPDATE\020\002\022\n\n\006DELETE\020\003B\026B\022KafkaMessage" +
+      "SampleP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -58,7 +59,7 @@ public final class KafkaMessageSample {
     internal_static_tutorial_KafkaMessage_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessage.FieldAccessorTable(
         internal_static_tutorial_KafkaMessage_descriptor,
-        new java.lang.String[] { "Id", "RequestType", "MethosType", "Body", });
+        new java.lang.String[] { "Id", "RequestType", "MethosType", "Body", "ReplyTo", });
     descriptor.resolveAllFeaturesImmutable();
   }
 
