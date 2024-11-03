@@ -1,45 +1,45 @@
-# Online crowdinvesting and financing search service
+# Online Crowdinvesting and Financing Search Service
 
-## Description of the project
+## Project Overview
 
-This project is an online service designed for crowdinvesting and helping start-up businesses and startups to attract financing. The platform provides an opportunity for investors with limited funds to invest in projects without high commissions. We also consider the legal and financial aspects related to crowdinvesting.
+This project is an online platform designed to facilitate crowdinvesting and assist start-ups in attracting financing. It allows investors with limited funds to invest in projects with minimal commissions, considering both legal and financial aspects of crowdinvesting.
 
-## Goals and objectives
 
-- **Creating a convenient platform** for investors and startups.
-- **Providing information** about available projects for investment.
-- **Ensuring transparency** of crowdinvesting processes.
-- **Assistance to startups** in preparing their projects to raise funds.
+## Technologies Used
 
-## Functionality
-
-- Registration of users (investors and startups).
-- Creation and management of projects for crowdinvesting.
-- View available projects and information about them.
-- The opportunity to invest in projects through the platform.
-- Notification system for the status of investments and projects.
-  
-## Technologies
-
-- **Programming language**: Java
+- **Programming Language**: Java
 - **Framework**: Spring Boot
-- **Database**: PostgreSQL
+- **Database**: H2
+- **API Documentation**: Swagger (available at [Swagger UI](http://localhost:8080/swagger-ui/index.html#))
 
 
+### API Authentication
 
+To interact with secured endpoints, use Spring Security's authentication. By default, the system is set up with the following in-memory user credentials:
+- **Username**: `OneLab`
+- **Password**: `1234`
 
-### Installation Steps
+To access the API:
+- Use tools like Postman or Swagger UI.
+- Add the default credentials to authenticate and test the secured endpoints.
 
-1. **Clone the repository**:
-``bash
-    git clone <Repository url>
-    ```
+### Using Swagger
 
-2. **Go to the project directory**:
-``bash
-    cd <catalog_name>
-    ```
+The platform includes Swagger for API documentation, available at [Swagger UI](http://localhost:8080/swagger-ui/index.html#). Use Swagger to:
+- Browse available API endpoints.
+- Execute requests and review responses.
+- Easily test authentication and authorization.
 
-3. **Configure the database**:
-- Create a new database in PostgreSQL.
-   - Update the `application.properties` file with your database connection data.
+### Additional Components
+
+- **AuthControllerAspect**: This aspect logs all requests made to controllers, providing an audit trail for API interactions.
+
+- **Global Exception Handling**: A `GlobalExceptionHandler` manages exceptions globally across the application:
+  - **ResourceNotFoundException**: Returns a `404 Not Found` with a custom error message.
+  - **Other Exceptions**: Returns a `500 Internal Server Error` for unexpected issues.
+
+The `GlobalExceptionHandler` ensures consistent error responses across the application, making it easier for users to understand and debug issues.
+
+---
+
+This setup provides a comprehensive, secure, and user-friendly platform for crowdinvesting, with built-in logging and error handling to enhance transparency and maintainability.
