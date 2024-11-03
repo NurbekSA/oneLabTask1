@@ -1,141 +1,119 @@
-//package service;
-//
-//import org.example.model.OrderModel;
-//import org.example.repository.OrderRepo;
-//import org.example.service.OrderService;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.mockito.InjectMocks;
-//import org.mockito.Mock;
-//import org.mockito.MockitoAnnotations;
-//import org.springframework.http.HttpStatus;
-//import org.springframework.http.ResponseEntity;
-//
-//import java.math.BigDecimal;
-//import java.util.Collections;
-//import java.util.List;
-//import java.util.Optional;
-//
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.junit.jupiter.api.Assertions.assertNotNull;
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.Mockito.verify;
-//import static org.mockito.Mockito.when;
-//
-//class OrderServiceTest {
-//
-//    @Mock
-//    private OrderRepo orderRepo;
-//
-//    @InjectMocks
-//    private OrderService orderService;
-//
-//    private OrderModel orderModel;
-//
-//    @BeforeEach
-//    void setUp() {
-//        MockitoAnnotations.openMocks(this);
-//        orderModel = new OrderModel();
-//        orderModel.setId(1L);
-//        orderModel.setInvestmentType("Equity");
-//        orderModel.setTargetAmount(BigDecimal.valueOf(10000));
-//        orderModel.setActualAmount(BigDecimal.valueOf(5000));
-//        orderModel.setCurrency("USD");
-//        orderModel.setDateOfOrder(System.currentTimeMillis());
-//        orderModel.setDueDate(System.currentTimeMillis() + 86400000); // 1 день позже
-//        orderModel.setPurpose("Investing in startup");
-//        orderModel.setDescription("Initial order for investment");
-//        orderModel.setCollateral("None");
-//        orderModel.setIsActive(true);
-//        orderModel.setIsAlive(true);
-//    }
-//
-//    @Test
-//    void testFindAll() {
-//        when(orderRepo.findAll()).thenReturn(Collections.singletonList(orderModel));
-//
-//        ResponseEntity<List<OrderModel>> response = orderService.findAll();
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(1, response.getBody().size());
-//        assertEquals(orderModel, response.getBody().get(0));
-//    }
-//
-//    @Test
-//    void testFindById_Found() {
-//        when(orderRepo.findById(1L)).thenReturn(Optional.of(orderModel));
-//
-//        ResponseEntity<OrderModel> response = orderService.findById(1L);
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(orderModel, response.getBody());
-//    }
-//
-//    @Test
-//    void testFindById_NotFound() {
-//        when(orderRepo.findById(1L)).thenReturn(Optional.empty());
-//
-//        ResponseEntity<OrderModel> response = orderService.findById(1L);
-//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-//        assertEquals(null, response.getBody());
-//    }
-//
-//    @Test
-//    void testCreate() {
-//        when(orderRepo.save(any(OrderModel.class))).thenReturn(orderModel);
-//
-//        ResponseEntity<?> response = orderService.create(orderModel);
-//        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-//        assertEquals(orderModel, response.getBody());
-//    }
-//
-//
-//    @Test
-//    void testFindAll_EmptyList() {
-//        when(orderRepo.findAll()).thenReturn(Collections.emptyList());
-//
-//        ResponseEntity<List<OrderModel>> response = orderService.findAll();
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(0, response.getBody().size());
-//    }
-//
-//    @Test
-//    void testCreate_SetsDateOfOrder() {
-//        when(orderRepo.save(any(OrderModel.class))).thenAnswer(invocation -> {
-//            OrderModel order = invocation.getArgument(0);
-//            order.setDateOfOrder(System.currentTimeMillis());
-//            return order;
-//        });
-//
-//        ResponseEntity<?> response = orderService.create(orderModel);
-//        OrderModel savedOrder = (OrderModel) response.getBody();
-//        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-//        assertNotNull(savedOrder.getDateOfOrder());
-//    }
-//
-//    @Test
-//    void testCreate_VerifySaveInvocation() {
-//        orderService.create(orderModel);
-//        verify(orderRepo).save(orderModel);
-//    }
-//
-//    @Test
-//    void testFindById_InvalidId() {
-//        ResponseEntity<OrderModel> response = orderService.findById(-1L);
-//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-//    }
-//
-//    @Test
-//    void testFindById_NullId() {
-//        ResponseEntity<OrderModel> response = orderService.findById(null);
-//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-//    }
-//
-//    @Test
-//    void testCreateWithSpecificCurrency() {
-//        orderModel.setCurrency("USD");
-//        when(orderRepo.save(any(OrderModel.class))).thenReturn(orderModel);
-//
-//        ResponseEntity<?> response = orderService.create(orderModel);
-//        OrderModel savedOrder = (OrderModel) response.getBody();
-//        assertEquals("USD", savedOrder.getCurrency());
-//    }
-//}
+package service;
+
+import org.example.entity.model.OrderModel;
+import org.example.entity.model.exception.ResourceNotFoundException;
+import org.example.entity.repository.OrderRepo;
+import org.example.entity.service.OrderService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+class OrderServiceTest {
+
+    @Mock
+    private OrderRepo orderRepo;
+
+    @InjectMocks
+    private OrderService orderService;
+
+    private OrderModel orderModel;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+        orderModel = new OrderModel();
+        orderModel.setId(1L);
+        orderModel.setInvestmentType("Equity");
+        orderModel.setTargetAmount(1000d);
+        orderModel.setActualAmount(351d);
+        orderModel.setCurrency("USD");
+        orderModel.setDateOfOrder(System.currentTimeMillis());
+        orderModel.setDueDate(System.currentTimeMillis() + 86400000); // 1 day later
+        orderModel.setPurpose("Investing in startup");
+        orderModel.setDescription("Initial order for investment");
+        orderModel.setCollateral("None");
+        orderModel.setIsActive(true);
+        orderModel.setIsAlive(true);
+    }
+
+    @Test
+    void testFindAll_whenRecordsExist_shouldReturnRecords() {
+        when(orderRepo.findAll()).thenReturn(Collections.singletonList(orderModel));
+
+        List<OrderModel> result = orderService.findAll();
+
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        assertEquals(orderModel, result.get(0));
+    }
+
+    @Test
+    void testFindAll_whenNoRecordsExist_shouldReturnEmptyList() {
+        when(orderRepo.findAll()).thenReturn(Collections.emptyList());
+
+        List<OrderModel> result = orderService.findAll();
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testFindById_whenRecordExists_shouldReturnRecord() {
+        when(orderRepo.findById(1L)).thenReturn(Optional.of(orderModel));
+
+        OrderModel result = orderService.findById(1L);
+
+        assertNotNull(result);
+        assertEquals(orderModel, result);
+    }
+
+    @Test
+    void testFindById_whenRecordDoesNotExist_shouldThrowException() {
+        when(orderRepo.findById(1L)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> orderService.findById(1L));
+        assertEquals("Order with id 1 not found", exception.getMessage());
+    }
+
+    @Test
+    void testCreate_shouldSaveAndReturnOrderModel() {
+        when(orderRepo.save(any(OrderModel.class))).thenReturn(orderModel);
+
+        OrderModel result = orderService.create(orderModel);
+
+        assertNotNull(result);
+        assertEquals(orderModel, result);
+        verify(orderRepo, times(1)).save(orderModel);
+    }
+
+    @Test
+    void testCreate_shouldSetDateOfOrder() {
+        when(orderRepo.save(any(OrderModel.class))).thenAnswer(invocation -> {
+            OrderModel savedOrder = invocation.getArgument(0);
+            savedOrder.setDateOfOrder(System.currentTimeMillis());
+            return savedOrder;
+        });
+
+        OrderModel result = orderService.create(orderModel);
+
+        assertNotNull(result);
+        assertNotNull(result.getDateOfOrder());
+        assertEquals(orderModel.getDateOfOrder(), result.getDateOfOrder());
+    }
+
+    @Test
+    void testCreate_whenOrderModelIsNull_shouldThrowIllegalArgumentException() {
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () -> orderService.create(null));
+        assertEquals("Order model cannot be null", exception.getMessage());
+    }
+}

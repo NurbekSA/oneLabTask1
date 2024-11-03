@@ -1,119 +1,80 @@
-//package controller;
-//
-//import org.example.Main;
-//import org.example.config.SecurityConfig;
-//import org.example.config.jwt.JwtUtil;
-//import org.example.controller.AuthController;
-//import org.example.entity.model.AuthRequest;
-//import org.example.entity.model.BusinessModel;
-//import org.junit.jupiter.api.BeforeEach;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.boot.test.web.client.TestRestTemplate;
-//import org.springframework.boot.test.web.server.LocalServerPort;
-//import org.springframework.context.annotation.ComponentScan;
-//import org.springframework.http.HttpEntity;
-//import org.springframework.http.HttpHeaders;
-//import org.springframework.http.HttpMethod;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.test.context.ActiveProfiles;
-//import org.springframework.test.context.ContextConfiguration;
-//import org.springframework.transaction.annotation.Transactional;
-//
-//import java.util.List;
-//
-//import static org.assertj.core.api.Assertions.assertThat;
-//
-//@ActiveProfiles("test")
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = Main.class)
-//@ContextConfiguration(classes = {AuthController.class, JwtUtil.class, SecurityConfig.class})
-//@ComponentScan(basePackages = "org.example")
-//public class BusinessControllerIntegrationTest {
-//
-//    @LocalServerPort
-//    private int port;
-//
-//    @Autowired
-//    private TestRestTemplate restTemplate;
-//
-//    private String jwtToken;
-//
-//    @BeforeEach
-//    public void setUp() {
-//        String url = "http://localhost:" + port + "/auth";
-//
-//        AuthRequest authRequest = new AuthRequest();
-//        authRequest.setUsername("Nur");
-//        authRequest.setPassword("12");
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        HttpEntity<AuthRequest> request = new HttpEntity<>(authRequest, headers);
-//        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
-//
-//        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-//        assertThat(response.getHeaders().get("Set-Cookie")).isNotEmpty();
-//        assertThat(response.getHeaders().get("Set-Cookie").get(0)).contains("jwtToken");
-//
-//
-//        List<String> cookies = response.getHeaders().get("Set-Cookie");
-//
-//        assertThat(cookies).isNotEmpty();
-//
-//        jwtToken = cookies.stream()
-//                .filter(cookie -> cookie.startsWith("jwtToken"))
-//                .findFirst()
-//                .orElseThrow(() -> new RuntimeException("JWT Token not found"));
-//
-//        System.out.println("4444");
-//    }
-//
-//
-//
-//
-////    @Test
-////    public void testGetAllBusinesses() {
-////
-////        String url = "http://localhost:" + port + "/business";
-////
-////        HttpHeaders headers = new HttpHeaders();
-////        headers.add("Cookie", jwtToken);
-////        HttpEntity<Void> request = new HttpEntity<>(headers);
-////
-////        ResponseEntity<BusinessModel[]> response = restTemplate.exchange(url, HttpMethod.GET, request, BusinessModel[].class);
-////
-////        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-////        assertThat(response.getBody()).isNotNull();
-////    }
-//
-//
-//    @Test
-//    @Transactional
-//    public void testCreateBusiness() {
-//        String url = "http://localhost:" + port + "/business";
-//
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.add("Cookie", jwtToken);
-//
-//        BusinessModel businessModel = new BusinessModel(null, null, "Example Corp", "123456789", "123 Business St", "Credit Card", "Technology", now, "John Doe", "123456789012", "+77011234567", "contact@example.com", now, now);
-//        businessModel.setDirectorNumber("1234567890");
-//        businessModel.setDirectorMail("director@example.com");
-//        businessModel.setIsCheked("Yes");
-//        businessModel.setDirectorFIO("John Doe");
-//        businessModel.setDirectorIIN("123456789012");
-//        businessModel.setCompanyName("Example Company");
-//        businessModel.setCompanyBIN("123456789");
-//        businessModel.setAddress("123 Example St");
-//        businessModel.setTypeOfPaymentSystem("Credit Card");
-//        businessModel.setSector("Retail");
-//        businessModel.setDateOfBusinessStarted(System.currentTimeMillis());
-//        businessModel.setCreatedAt(System.currentTimeMillis());
-//        businessModel.setUpdatedAt(System.currentTimeMillis());
-//
-//        HttpEntity<BusinessModel> request = new HttpEntity<>(businessModel, headers);
-//
-//        ResponseEntity<?> response = restTemplate.exchange(url, HttpMethod.POST, request, Void.class);
-//
-//        assertThat(response.getStatusCode().is2xxSuccessful()).isTrue();
-//    }
-//}
+package controller;
+
+
+import org.example.Main;
+import org.example.entity.model.BusinessModel;
+import org.example.entity.service.BusinessService;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.security.test.context.support.WithMockUser;
+
+import java.util.List;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@SpringBootTest(classes = Main.class) // Specify the main application class here
+@AutoConfigureMockMvc
+class BusinessControllerIntegrationTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private BusinessService businessService;
+
+    @Test
+    @WithMockUser(username = "Nurbek")
+    void testGetAll() throws Exception {
+        BusinessModel business = new BusinessModel();
+        business.setId(1L);
+        business.setCompanyName("Test Business");
+
+        when(businessService.findAll()).thenReturn(List.of(business));
+
+        mockMvc.perform(get("/api/business"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].companyName").value("Test Business"));
+    }
+
+    @Test
+    @WithMockUser(username = "Nurbek")
+    void testGetById_Found() throws Exception {
+        BusinessModel business = new BusinessModel();
+        business.setId(1L);
+        business.setCompanyName("Test Business"); // Use the correct field name
+
+        when(businessService.findById(1L)).thenReturn(business);
+
+        mockMvc.perform(get("/api/business/1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.companyName").value("Test Business")); // Updated JSON path
+    }
+
+    @Test
+    @WithMockUser(username = "Nurbek")
+    void testCreate() throws Exception {
+        BusinessModel business = new BusinessModel();
+        business.setId(1L);
+        business.setCompanyName("New Business");
+
+        when(businessService.create(any(BusinessModel.class))).thenReturn(business);
+
+        mockMvc.perform(post("/api/business")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\": \"New Business\"}"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.companyName").value("New Business"));
+    }
+}

@@ -2,7 +2,6 @@ package org.example.kafka;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.example.kafka.proto.tutorial.KafkaMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

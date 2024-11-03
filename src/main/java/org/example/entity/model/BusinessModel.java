@@ -36,4 +36,6 @@ public class BusinessModel {
     private Long dateOfBusinessStarted;
     private Long createdAt;
     private Long updatedAt;
+
+
 }

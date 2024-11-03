@@ -1,72 +1,38 @@
-//package org.example.aspect;
-//
-//import org.aspectj.lang.ProceedingJoinPoint;
-//import org.aspectj.lang.annotation.*;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.stereotype.Component;
-//import org.example.Entity.model.InvestmentModel;
-//import org.example.Entity.model.InvestorModel;
-//import org.example.Entity.repository.InvestmentRepo;
-//
-//import java.util.List;
-//
-//@Aspect
-//@Component
-//public class InvestorServiceAspect {
-//
-//    @Autowired
-//    private InvestmentRepo investmentRepo;
-//
-//    // Определение общего среза для метода findByIin
-//    @Pointcut("execution(* org.example.repository.InvestorRepo.findByIin(..))")
-//    public void findByIinPointcut() {}
-//
-//    // Before Advice
-//    @Before("findByIinPointcut() && args(iin)")
-//    public void beforeFindByIin(String iin) {
-//        System.out.println("Идет поиск инвестора с ИИН: " + iin);
-//    }
-//
-//    // AfterReturning Advice
-//    @AfterReturning(pointcut = "findByIinPointcut()", returning = "investor")
-//    public void afterReturningFindByIin(InvestorModel investor) {
-//        if (investor != null) {
-//            List<InvestmentModel> investments = investmentRepo.findByInvestor(investor);
-//            if (!investments.isEmpty()) {
-//                System.out.println("Инвестиции инвестора:");
-//                investments.forEach(investment -> System.out.println(investment.toString()));
-//            } else {
-//                System.out.println("У инвестора нет инвестиций.");
-//            }
-//        } else {
-//            System.out.println("Инвестор не найден.");
-//        }
-//    }
-//
-//    // AfterThrowing Advice: Обработка исключений
-//    @AfterThrowing(pointcut = "findByIinPointcut()", throwing = "ex")
-//    public void afterThrowingFindByIin(Exception ex) {
-//        System.out.println("Ошибка при выполнении поиска инвестора: " + ex.getMessage());
-//    }
-//
-//    // Around Advice: Время выполнения и дополнительная логика
-//    @Around("findByIinPointcut()")
-//    public Object aroundFindByIin(ProceedingJoinPoint joinPoint) throws Throwable {
-//        long startTime = System.currentTimeMillis();
-//        System.out.println("Начало выполнения метода findByIin...");
-//
-//        // Выполнение целевого метода
-//        Object result = null;
-//        try {
-//            result = joinPoint.proceed();
-//        } catch (Exception ex) {
-//            System.out.println("Исключение в методе findByIin: " + ex.getMessage());
-//            throw ex;
-//        }
-//
-//        long endTime = System.currentTimeMillis();
-//        System.out.println("Время выполнения метода findByIin: " + (endTime - startTime) + " мс");
-//
-//        return result;
-//    }
-//}
+package org.example.aspect;
+
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
+import org.aspectj.lang.annotation.AfterThrowing;
+import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
+import org.example.entity.model.InvestmentModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+@Aspect
+@Component
+public class InvestorServiceAspect {
+
+    private static final Logger logger = LoggerFactory.getLogger(InvestorServiceAspect.class);
+
+    // Logging before the execution of the create method
+    @Before("execution(* org.example.entity.service.InvestmentService.create(..)) && args(investment, cardId)")
+    public void beforeCreate(JoinPoint joinPoint, InvestmentModel investment, Long cardId) {
+        logger.info("Attempting to create a new investment for investor ID: {} and card ID: {}",
+                investment.getInvestor().getId(), cardId);
+    }
+
+    // Executing logic if the create method completes successfully
+    @AfterReturning(pointcut = "execution(* org.example.entity.service.InvestmentService.create(..))", returning = "result")
+    public void afterReturningCreate(JoinPoint joinPoint, Object result) {
+        InvestmentModel createdInvestment = (InvestmentModel) result;
+        logger.info("Investment with ID {} created successfully.", createdInvestment.getId());
+    }
+
+    // Handling exceptions thrown by the create method
+    @AfterThrowing(pointcut = "execution(* org.example.entity.service.InvestmentService.create(..))", throwing = "exception")
+    public void afterThrowingCreate(JoinPoint joinPoint, Throwable exception) {
+        logger.error("Exception occurred while creating investment: {}", exception.getMessage(), exception);
+    }
+}
