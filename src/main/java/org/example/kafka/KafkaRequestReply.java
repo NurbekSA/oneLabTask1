@@ -1,53 +1,91 @@
 package org.example.kafka;
 
 import com.google.protobuf.InvalidProtocolBufferException;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.example.proto.tutorial.KafkaMessage;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
+import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.example.kafka.proto.tutorial.KafkaMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.MessageListener;
-import org.springframework.kafka.listener.MessageListenerContainer;
 import org.springframework.stereotype.Service;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+
+import java.util.Collection;
+import java.util.concurrent.CountDownLatch;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
+import org.apache.kafka.common.TopicPartition;
+
+
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Service
+@AllArgsConstructor
 public class KafkaRequestReply {
+    private final Logger logger = LoggerFactory.getLogger(KafkaRequestReply.class);
 
-    @Autowired
-    private KafkaTemplate<String, byte[]> kafkaTemplate;
+    private final KafkaTemplate<String, byte[]> kafkaTemplate;
+    private final KafkaListenerEndpointRegistry registry;
+    private final ConcurrentKafkaListenerContainerFactory<String, byte[]> kafkaListenerContainerFactory;
 
-    @Autowired
-    private KafkaListenerEndpointRegistry registry;
-
-    public CompletableFuture<KafkaMessage> sendRequest(String data, String requestTopic, String responseTopic) {
+    public CompletableFuture<KafkaMessage> sendRequest(String data, String requestTopic, String responseTopic) throws InterruptedException {
         String requestId = UUID.randomUUID().toString();
         CompletableFuture<KafkaMessage> futureResponse = new CompletableFuture<>();
+        CountDownLatch consumerReadyLatch = new CountDownLatch(1);
 
-        MessageListenerContainer container = registry.getListenerContainer("responseListener");
-        if (container != null && !container.isRunning()) {
-            container.start();
-        }
-
-        container.setupMessageListener((MessageListener<String, byte[]>) message -> {
+        // Create container properties and set the message listener
+        ContainerProperties containerProperties = new ContainerProperties(responseTopic);
+        containerProperties.setGroupId("dynamic-group-" + requestId); // Unique Group ID
+        containerProperties.setMessageListener((MessageListener<String, byte[]>) message -> {
             try {
+                logger.info("KafkaRequestReply received a message");
                 KafkaMessage kafkaMessage = KafkaMessage.parseFrom(message.value());
                 if (kafkaMessage.getId().equals(requestId)) {
                     futureResponse.complete(kafkaMessage);
-                    container.stop();
+                    logger.info("KafkaRequestReply stops listening");
                 }
             } catch (InvalidProtocolBufferException e) {
                 futureResponse.completeExceptionally(e);
             }
         });
 
+        // Add a listener to know when the consumer is ready
+        containerProperties.setConsumerRebalanceListener(new ConsumerRebalanceListener() {
+            @Override
+            public void onPartitionsAssigned(Collection<TopicPartition> partitions) {
+                // Signal that the consumer is ready
+                consumerReadyLatch.countDown();
+            }
+
+            @Override
+            public void onPartitionsRevoked(Collection<TopicPartition> partitions) {
+                // Do nothing
+            }
+
+            @Override
+            public void onPartitionsLost(Collection<TopicPartition> partitions) {
+                // Do nothing
+            }
+        });
+
+        // Create and start the container
+        ConcurrentMessageListenerContainer<String, byte[]> container =
+                new ConcurrentMessageListenerContainer<>(kafkaListenerContainerFactory.getConsumerFactory(), containerProperties);
+        container.start();
+
+        // Wait for the consumer to be ready
+        consumerReadyLatch.await();
+
+        // Send the request message
         KafkaMessage requestMessage = KafkaMessage.newBuilder()
                 .setId(requestId)
                 .setRequestType(KafkaMessage.RequestType.REQUEST)
-                .setMethosType(KafkaMessage.MethodType.GET)
+                .setMethosType(KafkaMessage.MethodType.CREAT)
                 .setBody(data)
                 .setReplyTo(responseTopic)
                 .build();
@@ -55,18 +93,9 @@ public class KafkaRequestReply {
         byte[] messageBytes = requestMessage.toByteArray();
         kafkaTemplate.send(requestTopic, messageBytes);
 
-        return futureResponse;
-    }
+        // Stop the container when the future is completed
+        futureResponse.whenComplete((response, throwable) -> container.stop());
 
-    // Новый метод для прослушивания топика investment-topic
-    @KafkaListener(id = "investment-topic", topics = "investment-topic")
-    public void listenInvestmentTopic(ConsumerRecord<String, byte[]> record) {
-        try {
-            KafkaMessage kafkaMessage = KafkaMessage.parseFrom(record.value());
-            System.out.println("Получено сообщение из investment-topic: " + kafkaMessage);
-            // Здесь вы можете добавить логику обработки сообщений из investment-topic
-        } catch (InvalidProtocolBufferException e) {
-            e.printStackTrace();
-        }
+        return futureResponse;
     }
 }

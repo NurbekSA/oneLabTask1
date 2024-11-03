@@ -4,7 +4,7 @@ import org.example.Main;
 import org.example.config.SecurityConfig;
 import org.example.config.jwt.JwtUtil;
 import org.example.controller.AuthController;
-import org.example.model.AuthRequest;
+import org.example.entity.model.AuthRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,6 +1,8 @@
 package org.example.kafka;
 
-import org.example.proto.tutorial.KafkaMessage;
+import org.example.kafka.proto.tutorial.KafkaMessage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -9,15 +11,16 @@ import org.springframework.stereotype.Service;
 @Service
 @EnableKafka
 public class KafkaSender {
+    private final Logger logger = LoggerFactory.getLogger(KafkaSender.class);
     private final KafkaTemplate<String, byte[]> kafkaTemplate;
     @Autowired
     public KafkaSender(KafkaTemplate<String, byte[]> kafkaTemplate) {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendMessage(String topicName, String key, KafkaMessage message) {
+    public void sendMessage(String topicName, KafkaMessage message) {
         byte[] messageBytes = message.toByteArray();
-        kafkaTemplate.send(topicName,key, messageBytes);
-        System.out.println("Отправлено сообщение: " + message + " с ключом: " + key);
+        kafkaTemplate.send(topicName,messageBytes);
+        logger.info("Отправлено сообщение: {}", message);
     }
 }

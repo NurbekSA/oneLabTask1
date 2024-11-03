@@ -1,43 +1,30 @@
 package org.example.controller;
 
-import lombok.AllArgsConstructor;
-import org.example.model.BusinessModel;
-import org.example.service.BusinessService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
+import lombok.RequiredArgsConstructor;
+import org.example.entity.model.BusinessModel;
+import org.example.entity.service.BusinessService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("business")
-@AllArgsConstructor
+@RequestMapping("/api/business")
+@RequiredArgsConstructor
 public class BusinessController {
     private final BusinessService businessService;
 
     @GetMapping
-    public List<BusinessModel> getAll(){
-        ResponseEntity<?> response = businessService.findAll();
-        if(response.getStatusCode() == HttpStatus.OK){
-            return (List<BusinessModel>) response.getBody();
-        }
-        return null;
+    public List<BusinessModel> getAll() {
+        return businessService.findAll();
     }
 
-    @GetMapping(value = "/{id}")
-    public BusinessModel getById(@PathVariable Long id){
-        ResponseEntity<?> response = businessService.findById(id);
-        if(response.getStatusCode() == HttpStatus.OK){
-            return (BusinessModel) response.getBody();
-        }
-        return null;
+    @GetMapping("/{id}")
+    public BusinessModel getById(@PathVariable Long id) {
+        return businessService.findById(id);
     }
 
     @PostMapping
-    public HttpStatusCode create(@RequestBody BusinessModel businessModel){
-        ResponseEntity<?> response = businessService.create(businessModel);
-        return response.getStatusCode();
+    public BusinessModel create(@RequestBody BusinessModel businessModel) {
+        return businessService.create(businessModel);
     }
-
 }

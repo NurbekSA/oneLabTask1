@@ -1,58 +1,53 @@
 package org.example.controller;
 
-import lombok.AllArgsConstructor;
-import org.example.model.InvestmentModel;
-import org.example.service.InvestmentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.example.entity.model.InvestmentModel;
+import org.example.entity.service.InvestmentService;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/investment")
-@AllArgsConstructor
+@RequestMapping("/api/investments")
+@RequiredArgsConstructor
 public class InvestmentController {
 
     private final InvestmentService investmentService;
 
     @GetMapping
-    @Transactional(readOnly = true)
-    public List<InvestmentModel> getAllInvestments() {
-        ResponseEntity<?> response = investmentService.findAll();
-        if(response.getStatusCode() == HttpStatus.OK){
-            List<InvestmentModel> investmentModels = (List<InvestmentModel>) response.getBody();
-            System.out.println("lasnd.,a s.f,a s.d,f as.,dm as.kd.mxc v. zxc");
-            investmentModels.forEach(x -> System.out.println(x.toString()));
-            return investmentModels;
-        }
-        return null;
+    public ResponseEntity<List<InvestmentModel>> getAllInvestments() {
+        List<InvestmentModel> investments = investmentService.findAll();
+        return ResponseEntity.ok(investments);
     }
 
     @GetMapping("/{id}")
-    public InvestmentModel getInvestmentById(@PathVariable Long id) {
-        ResponseEntity<?> response = investmentService.findById(id);
-        if(response.getStatusCode() == HttpStatus.OK){
-            return (InvestmentModel) response.getBody();
-        }
-        return null;
+    public ResponseEntity<InvestmentModel> getInvestmentById(@PathVariable Long id) {
+        InvestmentModel investment = investmentService.findById(id);
+        return ResponseEntity.ok(investment);
     }
 
     @PostMapping
-    public HttpStatusCode createInvestment(@RequestBody InvestmentModel investmentModel) {
-        return investmentService.create(investmentModel).getStatusCode();
+    public ResponseEntity<InvestmentModel> createInvestment(@RequestBody InvestmentModel investment, @RequestParam Long cardId) {
+        InvestmentModel createdInvestment = investmentService.create(investment, cardId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdInvestment);
+    }
+    @PutMapping("/{id}/activate")
+    public ResponseEntity<InvestmentModel> activateInvestment(@PathVariable Long id) {
+        InvestmentModel updatedInvestment = investmentService.setActive(id);
+        return ResponseEntity.ok(updatedInvestment);
     }
 
-    @PutMapping("/{id}")
-    public HttpStatusCode updateInvestment(@PathVariable Long id, @RequestBody InvestmentModel investmentModel) {
-        return investmentService.update(id, investmentModel).getStatusCode();
+    @PutMapping("/{id}/logical-delete")
+    public ResponseEntity<InvestmentModel> logicalDeleteInvestment(@PathVariable Long id) {
+        InvestmentModel updatedInvestment = investmentService.logicalDelete(id);
+        return ResponseEntity.ok(updatedInvestment);
     }
 
     @DeleteMapping("/{id}")
-    public HttpStatusCode deleteInvestment(@PathVariable Long id) {
-        return investmentService.delete(id).getStatusCode();
+    public ResponseEntity<Void> deleteInvestment(@PathVariable Long id) {
+        investmentService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

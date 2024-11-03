@@ -3,8 +3,8 @@ package controller;
 import org.example.Main;
 import org.example.config.SecurityConfig;
 import org.example.config.jwt.JwtUtil;
-import org.example.model.AuthRequest;
-import org.example.model.OrderModel;
+import org.example.entity.model.AuthRequest;
+import org.example.entity.model.OrderModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,8 +100,8 @@ public class OrderControllerIntegrationTest {
         orderModel.setIsActive(true);
         orderModel.setIsAlive(true);
         orderModel.setInvestmentType("Equity");
-        orderModel.setTargetAmount(new BigDecimal("100000.00"));
-        orderModel.setActualAmount(new BigDecimal("50000.00"));
+        orderModel.setTargetAmount(100000d);
+        orderModel.setActualAmount(50000d);
         orderModel.setCurrency("USD");
         orderModel.setDateOfOrder(System.currentTimeMillis());
         orderModel.setDueDate(System.currentTimeMillis() + 86400000L); // +1 day
