@@ -16,13 +16,15 @@ public class DataLoader {
     private final InvestmentRepo investmentRepo;
     private final InvestorRepo investorRepo;
     private final OrderRepo orderRepo;
+    private final SimpleUserRepo userRepo;
 
-    public DataLoader(BusinessRepo businessRepo, CardRepo cardRepo, InvestmentRepo investmentRepo, InvestorRepo investorRepo, OrderRepo orderRepo) {
+    public DataLoader(BusinessRepo businessRepo, CardRepo cardRepo, InvestmentRepo investmentRepo, InvestorRepo investorRepo, OrderRepo orderRepo, SimpleUserRepo userRepo) {
         this.businessRepo = businessRepo;
         this.cardRepo = cardRepo;
         this.investmentRepo = investmentRepo;
         this.investorRepo = investorRepo;
         this.orderRepo = orderRepo;
+        this.userRepo = userRepo;
     }
 
     public void initDatabase() {
@@ -105,7 +107,6 @@ public class DataLoader {
         order.setPurpose("Business Expansion");
         order.setDescription("Expansion of operations to new regions");
         order.setCollateral("Real Estate");
-
         orderRepo.save(order);
 
         // Инициализация инвестиций
@@ -117,7 +118,13 @@ public class DataLoader {
         investment.setIsAlive(true);
         investment.setAmount(1000.00);
         investment.setInvestmentDate(now);
-
         investmentRepo.save(investment);
+
+
+        SimpleUser user = new SimpleUser();
+        user.setUsername("OneLab");
+        user.setPassword("$2y$10$aICpTR6zQj2kXz/aQbN8n.unrH38198JHIVrQy.MTsb0AIniDexCy");
+        user.setAuthority("User");
+        userRepo.save(user);
     }
 }

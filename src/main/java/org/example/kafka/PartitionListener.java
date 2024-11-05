@@ -47,6 +47,7 @@ public class PartitionListener {
     String payment(String credential){
         logger.info(credential);
         try {
+            //
             Thread.sleep(1000);
         }
         catch (Exception e){

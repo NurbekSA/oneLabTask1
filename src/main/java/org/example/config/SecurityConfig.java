@@ -28,25 +28,25 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public UserDetailsService userDetailsService(){
-        var menager = new InMemoryUserDetailsManager();
-        var user = User.withUsername("OneLab").password("$2y$10$HzrtzhdTrSbp0po0nUlzJeTwa0cmKSf.czA/l.TB.6u7iD0ev7tEa").build();
-
-        menager.createUser(user);
-        return menager;
-
-    }
+//    @Bean
+//    public UserDetailsService userDetailsService(){
+//        var menager = new InMemoryUserDetailsManager();
+//        var user = User.withUsername("OneLab").password("$2y$10$HzrtzhdTrSbp0po0nUlzJeTwa0cmKSf.czA/l.TB.6u7iD0ev7tEa").build();
+//
+//        menager.createUser(user);
+//        return menager;
+//
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http){
-        return http.getSharedObject(AuthenticationManager.class);
-    }
+//    @Bean
+//    public AuthenticationManager authenticationManager(HttpSecurity http){
+//        return http.getSharedObject(AuthenticationManager.class);
+//    }
 
 
 
