@@ -29,7 +29,7 @@ public class DataLoader {
 
     public void initDatabase() {
         long now = System.currentTimeMillis();
-        logger.info("Data Loader started");
+        logger.info("INITDATABASE: Data Loader started");
 
         // Инициализация бизнес-модели
         BusinessModel business = new BusinessModel();

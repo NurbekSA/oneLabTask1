@@ -4,6 +4,7 @@ import org.example.entity.model.CardModel;
 import org.example.entity.model.exception.ResourceNotFoundException;
 import org.example.entity.model.InvestmentModel;
 import org.example.entity.model.InvestorModel;
+import org.example.entity.model.exception.UnpaidException;
 import org.example.entity.repository.InvestmentRepo;
 import org.example.kafka.KafkaRequestReply;
 import org.example.kafka.proto.tutorial.KafkaMessage;
@@ -23,18 +24,10 @@ import java.util.concurrent.ExecutionException;
 @EnableTransactionManagement
 public class InvestmentService {
 
-    // Веб срвер отправляет запрос на инвестицию
-    // Перед добавлением проверяется Прощал ли инвестор проверку.
-    // Дело в том что после регистрации данные инвестора проходят проверку и в это время он может заходит в платформу
-    // Для безопасности значения setIsPaid setIsActive setIsAlive устонавляается на черверной части
-    // Отправляется сообщение пла платежный шлюз
-    // Метод обернут в транзакцию для отката при сбое
-
     private static final Logger logger = LoggerFactory.getLogger(InvestmentService.class);
     private final InvestmentRepo investmentRepo;
     private final InvestorService investorService;
     private final KafkaRequestReply kafkaRequestReply;
-
 
     public InvestmentService(InvestmentRepo investmentRepo, @Lazy InvestorService investorService, KafkaRequestReply kafkaRequestReply) {
         this.investmentRepo = investmentRepo;
@@ -43,28 +36,28 @@ public class InvestmentService {
     }
 
     public List<InvestmentModel> findAll() {
-        logger.info("Retrieving all investments from the database.");
+        logger.info("FIND_ALL: Retrieving all investments from the database.");
         List<InvestmentModel> investments = investmentRepo.findAll();
         if (investments.isEmpty()) {
-            logger.warn("No investments found in the database.");
+            logger.warn("FIND_ALL: No investments found in the database.");
             throw new ResourceNotFoundException("No investments found");
         }
-        logger.info("Successfully retrieved {} investments from the database.", investments.size());
+        logger.info("FIND_ALL: Successfully retrieved {} investments from the database.", investments.size());
         return investments;
     }
 
     public InvestmentModel findById(Long id) {
-        logger.info("Searching for investment with ID: {}", id);
+        logger.info("FIND_BY_ID: Searching for investment with ID: {}", id);
         return investmentRepo.findById(id)
                 .orElseThrow(() -> {
-                    logger.warn("Investment with ID {} not found.", id);
+                    logger.warn("FIND_BY_ID: Investment with ID {} not found.", id);
                     return new ResourceNotFoundException("Investment with id " + id + " not found");
                 });
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public InvestmentModel create(InvestmentModel investment, Long cardId) {
-        logger.info("Creating a new investment for investor ID: {} and card ID: {}", investment.getInvestor().getId(), cardId);
+        logger.info("CREATE: Creating a new investment for investor ID: {} and card ID: {}", investment.getInvestor().getId(), cardId);
         InvestorModel investor = investorService.findById(investment.getInvestor().getId());
 
         if (Boolean.FALSE.equals(investor.getIsChecked())) {
@@ -75,72 +68,79 @@ public class InvestmentService {
                 .filter(x -> x.getId().equals(cardId))
                 .findFirst()
                 .orElseThrow(() ->
-                    new ResourceNotFoundException("Failed to find Card")
+                        new ResourceNotFoundException("The card could not be found")
                 );
 
-        logger.info("Setting default investment properties.");
+        logger.info("CREATE: Setting default investment properties.");
         investment.setIsPaid(false);
         investment.setIsActive(false);
         investment.setIsAlive(false);
         investment.setInvestmentDate(System.currentTimeMillis());
 
-
-
-        logger.info("Investment.Creat. Sending message to Kafka topic 'payment-topic'");
+        logger.info("CREATE: Sending message to Kafka topic 'onelab.payment-api.payment-by-card'");
 
         try {
-            CompletableFuture<KafkaMessage> response = kafkaRequestReply.sendRequest(card.getCardNumber(),"payment-topic", "investment-topic");
-            KafkaMessage result = response.get(); // Блокирует поток до получения результата
-            logger.info("Получено сообщение: {}", result.getBody());
-        }catch (InterruptedException e) {
-            logger.warn("Thread was interrupted, restoring the interrupted status.", e);
-            Thread.currentThread().interrupt(); // Restore the interrupted status
+            CompletableFuture<KafkaMessage> response = kafkaRequestReply.sendRequest(card.getCardNumber(),"onelab.payment-api.payment-by-card", "onelab.entity-api.response");
+            KafkaMessage result = response.get();
+            String resultBody = result.getBody();
+
+            logger.info("CREATE: Received message: {}", resultBody);
+
+
+            if(result.getRequestResult() == KafkaMessage.RequestResult.FAILED || resultBody == null){
+                throw new UnpaidException("payment failed: " + result.getBody());
+            }
+            else {
+                logger.info("CREATE: Setting investment ID {} as paid.", investment.getId());
+
+                investment.setIsPaid(true);
+                investmentRepo.save(investment);
+
+                return investmentRepo.save(investment);
+            }
+
+        } catch (InterruptedException e) {
+            logger.warn("CREATE: Thread was interrupted, restoring the interrupted status.", e);
+            Thread.currentThread().interrupt();
+            throw new UnpaidException("Operation interrupted. Please try again later.");
         } catch (ExecutionException e) {
-            logger.warn("Execution exception occurred.", e);
-            e.printStackTrace();
+            logger.warn("CREATE: Execution exception occurred.", e);
+            throw new UnpaidException("Operation interrupted. Please try again later.");
         }
 
-
-        logger.info("Setting investment ID {} as paid.", investment.getId());
-
-        investment.setIsPaid(true);
-        investmentRepo.save(investment);
-
-        return investmentRepo.save(investment);
     }
 
-
     public InvestmentModel logicalDelete(Long id) {
-        logger.info("Logically deleting investment ID {}.", id);
+        logger.info("LOGICAL_DELETE: Logically deleting investment ID {}.", id);
         InvestmentModel investment = investmentRepo.findById(id)
                 .orElseThrow(() ->
-                     new ResourceNotFoundException("Investment not found")
+                        new ResourceNotFoundException("Investment not found")
                 );
         investment.setIsAlive(false);
         InvestmentModel updatedInvestment = investmentRepo.save(investment);
-        logger.info("Investment ID {} logically deleted successfully.", id);
+        logger.info("LOGICAL_DELETE: Investment ID {} logically deleted successfully.", id);
         return updatedInvestment;
     }
 
     public InvestmentModel setActive(Long id) {
-        logger.info("Setting investment ID {} as active.", id);
+        logger.info("SET_ACTIVE: Setting investment ID {} as active.", id);
         InvestmentModel investment = investmentRepo.findById(id)
                 .orElseThrow(() -> {
-                    logger.warn("Investment with ID {} not found.", id);
+                    logger.warn("SET_ACTIVE: Investment with ID {} not found.", id);
                     return new ResourceNotFoundException("Investment not found");
                 });
         investment.setIsActive(true);
         InvestmentModel updatedInvestment = investmentRepo.save(investment);
-        logger.info("Investment ID {} set as active successfully.", id);
+        logger.info("SET_ACTIVE: Investment ID {} set as active successfully.", id);
         return updatedInvestment;
     }
 
     public void delete(Long id) {
-        logger.info("Deleting investment with ID: {}", id);
+        logger.info("DELETE: Deleting investment with ID: {}", id);
         if (!investmentRepo.existsById(id)) {
             throw new ResourceNotFoundException("Investment with id " + id + " not found");
         }
         investmentRepo.deleteById(id);
-        logger.info("Investment with ID {} deleted successfully.", id);
+        logger.info("DELETE: Investment with ID {} deleted successfully.", id);
     }
 }

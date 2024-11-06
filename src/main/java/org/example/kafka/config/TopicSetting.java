@@ -27,12 +27,10 @@ public class TopicSetting {
         // Создание AdminClient для управления топиками
         try (AdminClient adminClient = AdminClient.create(props)) {
             // Создаем новый топик с 3 разделами и фактором репликации 1
-            NewTopic newPaymentTopic = new NewTopic("payment-topic", 2, (short) 1);
-            NewTopic newInvestmentTopic = new NewTopic("investment-topic", 1, (short) 1);
 
             // Создание топика в Kafka
-            adminClient.createTopics(Collections.singletonList(newPaymentTopic));
-            adminClient.createTopics(Collections.singletonList(newInvestmentTopic));
+            adminClient.createTopics(Collections.singletonList(new NewTopic("onelab.payment-api.payment-by-card", 4, (short) 1)));
+            adminClient.createTopics(Collections.singletonList(new NewTopic("onelab.entity-api.response", 2, (short) 1)));
             logger.info("Topic created succesful");
         } catch (Exception e) {
             logger.info("Mistake of creating a topic {}", e.getMessage());
@@ -53,7 +51,7 @@ public class TopicSetting {
 
             // Получение подробной информации о конкретном топике
             TopicDescription description = adminClient.describeTopics(
-                    Collections.singletonList("order-topic")).all().get().get("order-topic");// todo
+                    Collections.singletonList("onelab.entity-api.response")).all().get().get("onelab.entity-api.response");// todo
             logger.info("Topic description: {}", description);
         } catch (ExecutionException | InterruptedException e) {
             logger.warn("Mistake of getting info about topic: {}", e.getMessage());

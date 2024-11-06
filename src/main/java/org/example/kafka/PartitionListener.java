@@ -11,49 +11,63 @@ import org.springframework.stereotype.Service;
 @Service
 public class PartitionListener {
     private static final Logger logger = LoggerFactory.getLogger(PartitionListener.class);
-    private KafkaSender kafkaSender;
+    private final KafkaSender kafkaSender;
 
     public PartitionListener(KafkaSender kafkaSender) {
         this.kafkaSender = kafkaSender;
     }
 
-    // Слушатель для партиции 0
-    @KafkaListener(topics = "payment-topic", groupId = "group-1")
+    // Listener for partition 0
+    @KafkaListener(topics = "onelab.payment-api.payment-by-card", groupId = "group-1")
     public void listenPartition(ConsumerRecord<String, byte[]> messageInByte) {
-        logger.info("Партиция 'group-1' получила сообщение");
+        logger.info("LISTEN_PARTITION: Partition 'group-1' received a message");
         try {
             KafkaMessage message = KafkaMessage.parseFrom(messageInByte.value());
 
-            logger.info("Принято сообщение: {}, Тип запроса: {}", message, message.getRequestType());
+            logger.info("onelab.payment-api.payment-by-card: Received message: {}, Request type: {}", message);
 
-            if(message.getRequestType() == KafkaMessage.RequestType.REQUEST && message.getMethosType() == KafkaMessage.MethodType.CREAT){
+            if (message.getRequestType() == KafkaMessage.RequestType.REQUEST) {
+                String paymentResult = payment(message.getBody());
 
-                KafkaMessage responseMessage = KafkaMessage.newBuilder()
-                        .setId(message.getId())
-                        .setRequestType(KafkaMessage.RequestType.RESPONSE)
-                        .setBody(payment(message.getBody()))
-                        .build();
-                String topicName = message.getReplyTo(); // Укажите название вашего топика
+                KafkaMessage responseMessage;
+                String replyTo = message.getReplyTo();
 
-                kafkaSender.sendMessage(topicName,responseMessage);
-                logger.info("Отправлен ответ на {}", topicName);
+                if (paymentResult != null) {
+                    responseMessage = KafkaMessage.newBuilder()
+                            .setCorrelationId(message.getCorrelationId())
+                            .setRequestResult(KafkaMessage.RequestResult.SUCCESS)
+                            .setRequestType(KafkaMessage.RequestType.RESPONSE)
+                            .setBody(paymentResult)
+                            .build();
+
+                    logger.info("onelab.payment-api.payment-by-card: Sent success response to {}", replyTo);
+                } else {
+                    responseMessage = KafkaMessage.newBuilder()
+                            .setCorrelationId(message.getCorrelationId())
+                            .setRequestResult(KafkaMessage.RequestResult.FAILED)
+                            .setRequestType(KafkaMessage.RequestType.RESPONSE)
+                            .setBody("Insufficient funds")
+                            .build();
+
+                    logger.info("onelab.payment-api.payment-by-card: Sent failure response to {}", replyTo);
+                }
+
+                kafkaSender.sendMessage(replyTo, responseMessage);
             }
 
         } catch (InvalidProtocolBufferException e) {
-            logger.info("Ошибка десериализации: {}", e.getMessage());
+            logger.info("onelab.payment-api.payment-by-card: Deserialization error: {}", e.getMessage());
         }
     }
 
-    String payment(String credential){
-        logger.info(credential);
+    String payment(String credential) {
+        logger.info("PAYMENT: Processing payment for credential {}", credential);
         try {
-            //
+            // Simulating a payment delay
             Thread.sleep(1000);
+        } catch (Exception e) {
+            logger.info("PAYMENT: Error during payment process: {}", e.getMessage());
         }
-        catch (Exception e){
-            logger.info(e.getMessage());
-        }
-        return "Длинный чек об оплате";
+        return "Detailed payment receipt";
     }
 }
-

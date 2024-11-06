@@ -22,7 +22,7 @@ public class CardModel {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "investor_id", nullable = false)
+    @JoinColumn(name = "investor_id", nullable = true)
     private InvestorModel investor;
 
     private String cardNumber;

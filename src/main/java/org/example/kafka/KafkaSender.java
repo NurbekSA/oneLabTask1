@@ -21,6 +21,6 @@ public class KafkaSender {
     public void sendMessage(String topicName, KafkaMessage message) {
         byte[] messageBytes = message.toByteArray();
         kafkaTemplate.send(topicName,messageBytes);
-        logger.info("Отправлено сообщение: {}", message);
+        logger.info("SENDMESSAGE: send message: {}", message);
     }
 }

@@ -22,7 +22,7 @@ public class OrderModel {
     private List<InvestmentModel> investments;
 
     @ManyToOne
-    @JoinColumn(name = "business_id", nullable = false)
+    @JoinColumn(name = "business_id", nullable = true)
     @JsonIgnore
     private BusinessModel business;
 

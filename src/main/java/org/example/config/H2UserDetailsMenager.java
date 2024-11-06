@@ -21,9 +21,9 @@ public class H2UserDetailsMenager implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        logger.info("loadUserByUsername. Started");
+        logger.info("loadUserByUsername: Started");
         SimpleUser user = userRepo.findSimpleUserByUsername(username).orElseThrow(() -> new ResourceNotFoundException("SipleUser not found"));
-        logger.info("loadUserByUsername. Find user with pass {}", user.getPassword());
+        logger.info("loadUserByUsername: Find user with pass {}", user.getPassword());
         return new H2UserDetails(user);
     }
 }
