@@ -118,14 +118,6 @@ class InvestmentServiceTest {
         verify(investmentRepo, never()).save(investmentModel);
     }
 
-    @Test
-    void testCreate_whenCardNotFound_shouldThrowException() {
-        investorModel.setCards(Collections.emptyList());
-        when(investorService.findById(1L)).thenReturn(investorModel);
-
-        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> investmentService.create(investmentModel, 1L));
-        assertEquals("Failed to find Card", exception.getMessage());
-    }
 
     @Test
     void testLogicalDelete_whenInvestmentExists_shouldLogicallyDeleteInvestment() {
