@@ -11,6 +11,7 @@ This project is an online platform designed to facilitate crowdinvesting and ass
 - **Framework**: Spring Boot
 - **Database**: H2
 - **API Documentation**: Swagger (available at [Swagger UI](http://localhost:8080/swagger-ui/index.html#))
+- **AMQP*: Kafka
 
 
 ### API Authentication
@@ -30,16 +31,3 @@ The platform includes Swagger for API documentation, available at [Swagger UI](h
 - Execute requests and review responses.
 - Easily test authentication and authorization.
 
-### Additional Components
-
-- **AuthControllerAspect**: This aspect logs all requests made to controllers, providing an audit trail for API interactions.
-
-- **Global Exception Handling**: A `GlobalExceptionHandler` manages exceptions globally across the application:
-  - **ResourceNotFoundException**: Returns a `404 Not Found` with a custom error message.
-  - **Other Exceptions**: Returns a `500 Internal Server Error` for unexpected issues.
-
-The `GlobalExceptionHandler` ensures consistent error responses across the application, making it easier for users to understand and debug issues.
-
----
-
-This setup provides a comprehensive, secure, and user-friendly platform for crowdinvesting, with built-in logging and error handling to enhance transparency and maintainability.
