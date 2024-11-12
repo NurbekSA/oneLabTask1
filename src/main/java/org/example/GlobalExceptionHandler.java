@@ -1,7 +1,7 @@
 package org.example;
 
-import org.example.entity.model.exception.ErrorDetails;
-import org.example.entity.model.exception.ResourceNotFoundException;
+import org.example.persistence.model.exception.ErrorDetails;
+import org.example.persistence.model.exception.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

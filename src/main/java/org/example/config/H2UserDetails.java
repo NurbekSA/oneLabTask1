@@ -1,12 +1,14 @@
 package org.example.config;
 
-import org.example.entity.model.SimpleUser;
+import org.example.persistence.model.entity.SimpleUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 
 public class H2UserDetails implements UserDetails {
@@ -18,7 +20,10 @@ public class H2UserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(user.getAuthority()));
+        Set<GrantedAuthority> authorities = user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toSet());
+        return authorities;
     }
 
     @Override

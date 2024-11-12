@@ -1,8 +1,8 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.entity.model.OrderModel;
-import org.example.entity.service.OrderService;
+import org.example.persistence.model.dto.OrderModelDTO;
+import org.example.persistence.service.OrderService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,17 +15,17 @@ public class OrderController {
     private final OrderService orderService;
 
     @GetMapping
-    public List<OrderModel> getAllOrders() {
+    public List<OrderModelDTO> getAllOrders() {
         return orderService.findAll();
     }
 
     @GetMapping("/{id}")
-    public OrderModel getOrderById(@PathVariable Long id) {
+    public OrderModelDTO getOrderById(@PathVariable Long id) {
         return orderService.findById(id);
     }
 
     @PostMapping
-    public OrderModel createOrder(@RequestBody OrderModel orderModel) {
-        return orderService.create(orderModel);
+    public OrderModelDTO createOrder(@RequestBody OrderModelDTO orderModelDTO) {
+        return orderService.create(orderModelDTO);
     }
 }

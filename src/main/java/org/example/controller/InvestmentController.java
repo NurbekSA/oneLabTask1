@@ -1,8 +1,8 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.entity.model.InvestmentModel;
-import org.example.entity.service.InvestmentService;
+import org.example.persistence.model.dto.InvestmentModelDTO;
+import org.example.persistence.service.InvestmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,32 +17,27 @@ public class InvestmentController {
     private final InvestmentService investmentService;
 
     @GetMapping
-    public ResponseEntity<List<InvestmentModel>> getAllInvestments() {
-        List<InvestmentModel> investments = investmentService.findAll();
-        return ResponseEntity.ok(investments);
+    public ResponseEntity<List<InvestmentModelDTO>> getAllInvestments() {
+        return ResponseEntity.ok(investmentService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<InvestmentModel> getInvestmentById(@PathVariable Long id) {
-        InvestmentModel investment = investmentService.findById(id);
-        return ResponseEntity.ok(investment);
+    public ResponseEntity<InvestmentModelDTO> getInvestmentById(@PathVariable Long id) {
+        return ResponseEntity.ok(investmentService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<InvestmentModel> createInvestment(@RequestBody InvestmentModel investment, @RequestParam Long cardId) {
-        InvestmentModel createdInvestment = investmentService.create(investment, cardId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdInvestment);
+    public ResponseEntity<InvestmentModelDTO> createInvestment(@RequestBody InvestmentModelDTO investment, @RequestParam Long cardId) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(investmentService.create(investment, cardId));
     }
     @PutMapping("/{id}/activate")
-    public ResponseEntity<InvestmentModel> activateInvestment(@PathVariable Long id) {
-        InvestmentModel updatedInvestment = investmentService.setActive(id);
-        return ResponseEntity.ok(updatedInvestment);
+    public ResponseEntity<InvestmentModelDTO> activateInvestment(@PathVariable Long id) {
+        return ResponseEntity.ok(investmentService.setActive(id));
     }
 
     @PutMapping("/{id}/logical-delete")
-    public ResponseEntity<InvestmentModel> logicalDeleteInvestment(@PathVariable Long id) {
-        InvestmentModel updatedInvestment = investmentService.logicalDelete(id);
-        return ResponseEntity.ok(updatedInvestment);
+    public ResponseEntity<InvestmentModelDTO> logicalDeleteInvestment(@PathVariable Long id) {
+        return ResponseEntity.ok(investmentService.logicalDelete(id));
     }
 
     @DeleteMapping("/{id}")

@@ -1,8 +1,8 @@
 package org.example.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.entity.model.BusinessModel;
-import org.example.entity.service.BusinessService;
+import org.example.persistence.model.dto.BusinessModelDTO;
+import org.example.persistence.service.BusinessService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,17 +14,17 @@ public class BusinessController {
     private final BusinessService businessService;
 
     @GetMapping
-    public List<BusinessModel> getAll() {
+    public List<BusinessModelDTO> getAll() {
         return businessService.findAll();
     }
 
     @GetMapping("/{id}")
-    public BusinessModel getById(@PathVariable Long id) {
+    public BusinessModelDTO getById(@PathVariable Long id) {
         return businessService.findById(id);
     }
 
     @PostMapping
-    public BusinessModel create(@RequestBody BusinessModel businessModel) {
+    public BusinessModelDTO create(@RequestBody BusinessModelDTO businessModel) {
         return businessService.create(businessModel);
     }
 }

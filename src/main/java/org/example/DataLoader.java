@@ -1,12 +1,14 @@
 package org.example;
 
-import org.example.entity.model.*;
-import org.example.entity.repository.*;
+import org.example.persistence.model.entity.*;
+import org.example.persistence.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class DataLoader {
@@ -17,14 +19,16 @@ public class DataLoader {
     private final InvestorRepo investorRepo;
     private final OrderRepo orderRepo;
     private final SimpleUserRepo userRepo;
+    private final RoleRepo roleRepo;
 
-    public DataLoader(BusinessRepo businessRepo, CardRepo cardRepo, InvestmentRepo investmentRepo, InvestorRepo investorRepo, OrderRepo orderRepo, SimpleUserRepo userRepo) {
+    public DataLoader(BusinessRepo businessRepo, CardRepo cardRepo, InvestmentRepo investmentRepo, InvestorRepo investorRepo, OrderRepo orderRepo, SimpleUserRepo userRepo, RoleRepo roleRepo) {
         this.businessRepo = businessRepo;
         this.cardRepo = cardRepo;
         this.investmentRepo = investmentRepo;
         this.investorRepo = investorRepo;
         this.orderRepo = orderRepo;
         this.userRepo = userRepo;
+        this.roleRepo = roleRepo;
     }
 
     public void initDatabase() {
@@ -120,11 +124,23 @@ public class DataLoader {
         investment.setInvestmentDate(now);
         investmentRepo.save(investment);
 
+        RoleModel adminRole = new RoleModel();
+        adminRole.setName("ADMIN");
+        roleRepo.save(adminRole);
+
+        RoleModel userRole = new RoleModel();
+        userRole.setName("USER");
+        roleRepo.save(userRole);
 
         SimpleUser user = new SimpleUser();
-        user.setUsername("OneLab");
-        user.setPassword("$2y$10$aICpTR6zQj2kXz/aQbN8n.unrH38198JHIVrQy.MTsb0AIniDexCy");
-        user.setAuthority("User");
+        user.setUsername("Nurbek");
+        user.setPassword("$2y$10$aICpTR6zQj2kXz/aQbN8n.unrH38198JHIVrQy.MTsb0AIniDexCy"); // Уже зашифрованный пароль
+
+        Set<RoleModel> roles = new HashSet<>();
+        roles.add(adminRole);
+        roles.add(userRole);
+
+        user.setRoles(roles);
         userRepo.save(user);
     }
 }
