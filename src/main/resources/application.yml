@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: withoutKafka
   datasource:
     url: jdbc:postgresql://localhost:5432/croud_invest_db
     driver-class-name: org.postgresql.Driver
@@ -14,23 +16,35 @@ spring:
       hibernate:
         format_sql: true
 
-  kafka:
-    bootstrap-servers: localhost:9092
-    consumer:
-      auto-offset-reset: earliest
-      enable-auto-commit: true
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
-
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-
 logging:
   level:
-    root: INFO               # Уровень логирования для корневого логгера
-    org.hibernate.SQL: DEBUG  # Логирование SQL-запросов
-    org.hibernate.type: TRACE  # Логирование типов данных
-    # Добавьте дополнительные пакеты по мере необходимости
+    root: INFO
+
 server:
   port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: withKafka
+kafka:
+  bootstrap-servers: localhost:9092
+  consumer:
+    auto-offset-reset: earliest
+    enable-auto-commit: true
+    key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+  producer:
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+
+---
+spring:
+  config:
+    activate:
+      on-profile: withoutKafka
+kafka:
+  bootstrap-servers: ""
+  consumer: {}
+  producer: {}

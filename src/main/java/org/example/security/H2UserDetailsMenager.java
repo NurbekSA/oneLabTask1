@@ -1,19 +1,14 @@
-package org.example.config;
+package org.example.security;
 
 import org.example.persistence.model.entity.SimpleUser;
 import org.example.persistence.model.exception.ResourceNotFoundException;
 import org.example.persistence.repository.SimpleUserRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class H2UserDetailsMenager implements UserDetailsService {

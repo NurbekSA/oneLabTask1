@@ -1,10 +1,10 @@
 package org.example.persistence.model.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.persistence.model.entity.RoleModel;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +18,12 @@ public class SimpleUser {
     long id;
     String username;
     String password;
+    @ManyToMany
+    @JoinTable(
+            name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private Set<RoleModel> roles = new HashSet<>();
 
 }

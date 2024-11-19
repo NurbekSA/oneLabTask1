@@ -5,11 +5,12 @@ import org.example.persistence.model.dto.InvestorModelDTO;
 import org.example.persistence.model.entity.InvestorModel;
 import org.example.persistence.model.exception.ResourceNotFoundException;
 import org.example.persistence.repository.InvestorRepo;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Profile("withKafka")
 @Service
 @RequiredArgsConstructor
 public class InvestorService {

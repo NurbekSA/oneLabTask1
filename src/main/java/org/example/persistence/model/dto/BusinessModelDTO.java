@@ -29,5 +29,4 @@ public class BusinessModelDTO {
     private Long updatedAt;
 
     // Чтобы включить только нужную информацию из OrderModel, можно добавить список ID заказов.
-    private List<Long> orderIds;
 }

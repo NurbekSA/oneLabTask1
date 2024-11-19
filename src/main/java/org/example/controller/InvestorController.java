@@ -3,8 +3,9 @@ package org.example.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.persistence.model.dto.InvestorModelDTO;
 import org.example.persistence.service.InvestorService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
-
+@Profile("withKafka")
 @RestController
 @RequestMapping("/api/investor")
 @RequiredArgsConstructor

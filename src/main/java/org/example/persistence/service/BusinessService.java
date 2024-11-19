@@ -36,8 +36,7 @@ public class BusinessService {
                 businessModel.getSector(),
                 businessModel.getDateOfBusinessStarted(),
                 businessModel.getCreatedAt(),
-                businessModel.getUpdatedAt(),
-                businessModel.getOrders().stream().map(order -> order.getId()).collect(Collectors.toList())
+                businessModel.getUpdatedAt()
         );
     }
 

@@ -98,11 +98,11 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>org.camunda.bpm.springboot</groupId>
-            <artifactId>camunda-bpm-spring-boot-starter</artifactId>
-            <version>7.15.0</version> <!-- проверьте последнюю версию -->
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.camunda.bpm.springboot</groupId>-->
+<!--            <artifactId>camunda-bpm-spring-boot-starter</artifactId>-->
+<!--            <version>7.15.0</version> &lt;!&ndash; проверьте последнюю версию &ndash;&gt;-->
+<!--        </dependency>-->
 
 
 

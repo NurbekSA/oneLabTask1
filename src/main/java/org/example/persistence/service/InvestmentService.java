@@ -13,6 +13,7 @@ import org.example.persistence.repository.InvestorRepo;
 import org.example.persistence.repository.OrderRepo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Isolation;
@@ -23,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
+@Profile("withKafka")
 @Service
 @EnableTransactionManagement
 public class InvestmentService {

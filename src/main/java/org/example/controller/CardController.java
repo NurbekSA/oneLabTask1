@@ -6,7 +6,7 @@ import org.example.persistence.service.CardService;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/card")
+@RequestMapping("/api/card")
 @RequiredArgsConstructor
 public class CardController {
 

@@ -5,9 +5,11 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.example.kafka.proto.tutorial.KafkaMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+@Profile("withKafka")
 @Service
 public class PartitionListener {
     private static final Logger logger = LoggerFactory.getLogger(PartitionListener.class);
