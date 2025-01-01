@@ -1,50 +1,97 @@
 package org.example.service;
 
 import org.example.model.InvestmentModel;
+import org.example.model.InvestorModel;
 import org.example.repository.InvestmentRepo;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
 public class InvestmentService {
-    Long now = System.currentTimeMillis();
+    private static final Logger logger = LoggerFactory.getLogger(InvestmentService.class);
     private final InvestmentRepo investmentRepo;
 
-    @Autowired
-    public InvestmentService(InvestmentRepo investmentRepo) {
+    private final InvestorService investorService;
+
+    public InvestmentService(InvestmentRepo investmentRepo, @Lazy InvestorService investorService) {
         this.investmentRepo = investmentRepo;
+        this.investorService = investorService;
     }
 
-    // Получить все записи
-    public List<InvestmentModel> findAll() {
-        return investmentRepo.findAll();
+    public ResponseEntity<?> findAll() {
+        List<InvestmentModel> investments = investmentRepo.findAll();
+        if (investments == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        return ResponseEntity.ok(investments);
     }
 
-    // Получить запись по ID
-    public InvestmentModel findById(Long id) {
-        return investmentRepo.findById(id).orElse(null);
+    public ResponseEntity<?> findById(Long id) {
+        InvestmentModel investments = investmentRepo.findById(id).orElse(null);
+        if (investments == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+
+        return ResponseEntity.ok(investments);
+    }
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public ResponseEntity<?> create(InvestmentModel investment) {
+
+        ResponseEntity<?> response = investorService.findById(investment.getId());
+        if (response.getStatusCode() != HttpStatus.OK)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response.getBody());
+
+        InvestorModel investor = (InvestorModel)response.getBody();
+
+        if (!investor.getIsChecked())
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Инвестор не прошёл проверку.");
+
+        if (investor.getCards() == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Карта не привязана");
+
+        investment.setIsPaid(false);
+        investment.setIsActive(false);
+        investment.setIsAlive(false);
+        investment.setInvestmentDate(System.currentTimeMillis());
+
+        investmentRepo.save(investment);
+
+        logger.info("Инвестиция успешно сохранена в БД");
+
+        // todo: sending a payment request
+
+        return ResponseEntity.ok(investment);
     }
 
-    // Создать новую запись
-    public InvestmentModel create(InvestmentModel investmentModel) {
-        investmentModel.setInvestmentDate(now); // Устанавливаем дату инвестиции
-        return investmentRepo.save(investmentModel);
+    public ResponseEntity<?> update(Long id, InvestmentModel updatedInvestment) {
+        InvestmentModel existInvestment = investmentRepo.findById(id).orElse(null);
+        if (existInvestment == null)
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Не удалось найти инвестицию  с айди" + id);
+
+        existInvestment.setIsAlive(updatedInvestment.getIsAlive());
+        existInvestment.setInvestmentDate(updatedInvestment.getInvestmentDate());
+        existInvestment.setIsActive(updatedInvestment.getIsActive());
+        existInvestment.setAmount(updatedInvestment.getAmount());
+        existInvestment.setInvestor(updatedInvestment.getInvestor());
+        existInvestment.setOrder(updatedInvestment.getOrder());
+        existInvestment.setIsPaid(updatedInvestment.getIsPaid());
+
+        return ResponseEntity.ok(investmentRepo.save(updatedInvestment));
     }
 
-    // Обновить существующую запись
-    public InvestmentModel update(Long id, InvestmentModel updatedInvestmentModel) {
+
+    public ResponseEntity<?> delete(Long id) {
         if (investmentRepo.existsById(id)) {
-            updatedInvestmentModel.setId(id);
-            return investmentRepo.save(updatedInvestmentModel);
+            investmentRepo.deleteById(id);
+            return ResponseEntity.ok("Успешно удалено");
         }
-        return null; // Или можно выбросить исключение
-    }
-
-    // Удалить запись
-    public void delete(Long id) {
-        investmentRepo.deleteById(id);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Инвестиция не найдена");
     }
 }

@@ -1,35 +1,41 @@
 package org.example.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Entity
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+
 public class InvestorModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+
+    @OneToMany(mappedBy = "investor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CardModel> cards;
+    @OneToMany(mappedBy = "investor", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<InvestmentModel> investment;
+
+    private Boolean isChecked;
+
+    private BigDecimal score;
+
     private String iin;
     private String fio;
     private String phoneNumber;
     private String mail;
     private String address;
-    private String investorType; // Изменено на lowercase для соответствия стандартам Java
+    private String investorType;
     private Long createdAt;
     private Long updatedAt;
 
-    public String getMail() {
-        return mail;
-    }
+
+
 }

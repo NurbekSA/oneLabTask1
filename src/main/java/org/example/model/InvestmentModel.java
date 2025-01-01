@@ -1,10 +1,7 @@
 package org.example.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -27,10 +24,12 @@ public class InvestmentModel {
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     private OrderModel order;
+    private Boolean isPaid; // (оплачено/не оплачено)
+    private Boolean isActive; //(инвестируемый одер собрал сумму/нет)
+    private Boolean isAlive; // Логическое удаление
 
     private BigDecimal amount;
     private long investmentDate;
-    private String status;
 
 
 }

@@ -1,10 +1,27 @@
 # Investment Management System
 
+
 ## Основные возможности
 - CRUD-операции для всех сущностей.
 - Инициализация базы данных тестовыми данными.
 - Встроенная база данных H2 для тестирования и демонстрации.
 - Пример использования Spring AOP
+
+## Practice 3. The transaction is in the Investment Service create method
+### Method Description: `create`
+The `create` method processes a new investment record. It performs the following steps:
+1. **Investor Validation**: Retrieves the investor associated with the investment. If the investor is not found, it returns a `BAD_REQUEST` response.
+2. **Checks**: 
+   - Verifies if the investor has passed verification. If not, it returns a `BAD_REQUEST` response indicating the investor has not been verified.
+   - Checks if the investor has linked cards. If none are found, it returns a `BAD_REQUEST` response.
+3. **Investment Initialization**: Sets various properties of the investment, such as marking it as unpaid and inactive, and sets the investment date to the current timestamp.
+4. **Save Investment**: Saves the investment to the database.
+5. **Logging**: Logs a success message indicating the investment was saved.
+6. **Response**: Returns an `OK` response with the created investment object upon successful processing.
+
+
+## Description of the project
+
 
 ### консоль h2 доступен по url: http://localhost:8080/h2-console. Url бд - url: jdbc:h2:mem:testdb
 

@@ -4,24 +4,27 @@ package org.example.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.OffsetDateTime;
 import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@ToString
 public class OrderModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<InvestmentModel> investments;
+
     @ManyToOne
-    @JoinColumn(name = "investor_id", nullable = false)
-    private InvestorModel investor;
+    @JoinColumn(name = "business_id", nullable = false)
+    private BusinessModel business;
+
+    private Boolean isActive; //(инвестируемый одер собрал сумму/нет)
+    private Boolean isAlive; // Логическое удаление
 
     private String investmentType;
     private BigDecimal targetAmount;
@@ -34,9 +37,25 @@ public class OrderModel {
     private String description;
     private String collateral;
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<InvestmentModel> investments;
-
-    // Конструктор, геттеры и сеттеры
-
+    public OrderModel(Long id, List<InvestmentModel> investments, BusinessModel business, Boolean isActive,
+                      Boolean isAlive, String investmentType, BigDecimal targetAmount,
+                      BigDecimal actualAmount, String currency, long dateOfOrder,
+                      long dueDate, String status, String purpose, String description,
+                      String collateral, String aNull) {
+        this.id = id;
+        this.investments = investments;
+        this.business = business;
+        this.isActive = isActive;
+        this.isAlive = isAlive;
+        this.investmentType = investmentType;
+        this.targetAmount = targetAmount;
+        this.actualAmount = actualAmount;
+        this.currency = currency;
+        this.dateOfOrder = dateOfOrder;
+        this.dueDate = dueDate;
+        this.status = status;
+        this.purpose = purpose;
+        this.description = description;
+        this.collateral = collateral;
+    }
 }

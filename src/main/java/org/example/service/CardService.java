@@ -3,9 +3,10 @@ package org.example.service;
 import org.example.model.CardModel;
 import org.example.repository.CardRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 @Service
@@ -19,35 +20,18 @@ public class CardService {
         this.cardRepo = cardRepo;
     }
 
-    // Получить все записи
-    public List<CardModel> findAll() {
-        return cardRepo.findAll();
+    public ResponseEntity<CardModel> findById(Long id) {
+        CardModel cardModel = cardRepo.findById(id).orElse(null);
+        if (cardModel == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
+        return ResponseEntity.ok(cardModel);
     }
 
-    // Получить запись по ID
-    public CardModel findById(Long id) {
-        return cardRepo.findById(id).orElse(null);
-    }
-
-    // Создать новую запись
-    public CardModel create(CardModel cardModel) {
+    public ResponseEntity<?> create(CardModel cardModel) {
         cardModel.setCreatedAt(now); // Устанавливаем дату создания
         cardModel.setUpdatedAt(now); // Устанавливаем дату обновления
-        return cardRepo.save(cardModel);
-    }
-
-    // Обновить существующую запись
-    public CardModel update(Long id, CardModel updatedCardModel) {
-        if (cardRepo.existsById(id)) {
-            updatedCardModel.setId(id);
-            updatedCardModel.setUpdatedAt(now); // Обновляем дату
-            return cardRepo.save(updatedCardModel);
-        }
-        return null; // Или можно выбросить исключение
-    }
-
-    // Удалить запись
-    public void delete(Long id) {
-        cardRepo.deleteById(id);
+        CardModel savedCard = cardRepo.save(cardModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedCard);
     }
 }
